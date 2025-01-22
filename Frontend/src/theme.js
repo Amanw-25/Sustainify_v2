@@ -141,7 +141,11 @@ export const themeSettings = (mode) => {
               light: colors.grey[100],
             },
             background: {
-              default: colors.primary[500],
+              default: colors.greenAccent[100],
+            },
+            text: {
+              primary: "#000000", // Black text for primary text
+              secondary: "#333333", // Slightly lighter black for secondary text
             },
           }
         : {
@@ -212,5 +216,3 @@ export const useMode = () => {
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   return [theme, colorMode];
 };
-
-
