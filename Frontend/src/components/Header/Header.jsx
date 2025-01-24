@@ -42,7 +42,7 @@ const Header = () => {
   };
 
   return (
-    <header className="header flex items-center py-4 px-6 bg-white shadow-md sticky top-0 z-50">
+    <header className="header flex items-center py-0 px-6 bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -79,7 +79,7 @@ const Header = () => {
             <Box display="flex">
               <IconButton onClick={colorMode.toggleColorMode}>
                 {theme.palette.mode === "dark" ? (
-                  <DarkModeOutlinedIcon className="text-black"/>
+                  <DarkModeOutlinedIcon className="text-black" />
                 ) : (
                   <LightModeOutlinedIcon className="text-black" />
                 )}
