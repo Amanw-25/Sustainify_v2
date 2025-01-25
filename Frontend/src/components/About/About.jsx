@@ -4,7 +4,7 @@ import About_img from "../../assets/images/about_img.jpg";
 
 const About = () => {
   return (
-    <Box sx={{ py: 8, backgroundColor: "#f5f5f5" }}>
+    <Box sx={{ py: 8}}>
       <Container maxWidth="lg">
         <Grid container spacing={6} alignItems="center">
           <Grid item xs={12} md={6} sx={{ marginTop: { xs: 6, md: 15 } }}>
@@ -13,7 +13,7 @@ const About = () => {
                 borderRadius: "16px",
                 overflow: "hidden",
                 boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-                marginRight: { xs: 0, md: 10 }, // Add this line to add margin on the right side
+                marginRight: { xs: 0, md: 10 },
                 "& img": {
                   width: "100%",
                   height: "500px",

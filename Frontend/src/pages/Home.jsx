@@ -4,9 +4,11 @@ import { Box, Button, Typography, Avatar, TextField, Grid, Container } from "@mu
 import Home_bg from "../assets/images/Home_bg.jpg";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import userImg from "../assets/images/user.png";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+
 import EmailIcon from "@mui/icons-material/Email";
 import About from "../components/About/About";
+import Testimonial from "../components/Testimonal/Testimonal";
+import Service from "../components/Service/Service";
 
 const Home = () => {
   return (
@@ -127,91 +129,16 @@ const Home = () => {
         </Box>
       </Box>
 
-      <About/>
-
-      {/* Services Section */}
-      <Box sx={{ backgroundColor: "#f5f5f5", py: 8 }}>
-        <Container maxWidth="lg">
-          <Typography variant="h3" fontWeight="bold" align="center" gutterBottom>
-            Our Services
-          </Typography>
-          <Typography variant="body1" align="center" paragraph>
-            We offer a wide range of services to help you transition to
-            eco-friendly energy solutions, from solar panel installations to
-            energy audits and wind farm projects.
-          </Typography>
-          <Grid container spacing={4} sx={{ mt: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  padding: "24px",
-                  textAlign: "center",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              >
-                <CheckCircleIcon sx={{ fontSize: 48, color: "green" }} />
-                <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                  Solar Panel Installation
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  Our experts provide professional solar panel installation
-                  services, helping you switch to clean, renewable energy.
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  padding: "24px",
-                  textAlign: "center",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              >
-                <CheckCircleIcon sx={{ fontSize: 48, color: "green" }} />
-                <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                  Energy Audits
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  We offer energy audits to identify areas for improvement in
-                  energy usage, ensuring your facility runs efficiently.
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  padding: "24px",
-                  textAlign: "center",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              >
-                <CheckCircleIcon sx={{ fontSize: 48, color: "green" }} />
-                <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-                  Wind Farm Projects
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  Our wind farm solutions are designed to provide sustainable
-                  and reliable power, significantly reducing reliance on fossil
-                  fuels.
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+      <About />
+      <Service />
+      <Testimonial />
 
       {/* Email Subscribe Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 16 }}>
         <Box
           sx={{
-            backgroundColor: "#1976d2",
-            borderRadius: "8px",
+            backgroundColor: "#096AFF",
+            borderRadius: "50px",
             padding: "32px",
             textAlign: "center",
             color: "white",
@@ -239,14 +166,22 @@ const Home = () => {
               placeholder="Enter your email"
               sx={{
                 backgroundColor: "white",
-                borderRadius: "4px",
+                borderRadius: "100px",
                 width: { xs: "100%", sm: "300px" },
+                '& input::placeholder': {
+                  fontWeight: 'bold',
+                  color: '#3e3636',
+                  opacity: 1,
+                },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '100px',
+                },
               }}
             />
             <Button
               variant="contained"
               sx={{
-                borderRadius: "4px",
+                borderRadius: "50px",
                 padding: "12px 24px",
                 textTransform: "none",
                 fontWeight: "bold",
