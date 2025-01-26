@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Home_bg from "../assets/images/login_bg.jpg";
+import Home_bg from "../../assets/images/Home_bg.jpg";
 
 const Login = () => {
   const [formData, setFormData] = useState({

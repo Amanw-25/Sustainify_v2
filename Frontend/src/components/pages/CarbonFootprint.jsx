@@ -1,5 +1,5 @@
 import React from 'react'
-import Calculator from '../../components/Calculator/calculator'
+import Calculator from '../layout/Calculator/calculator'
 
 const CarbonCalculator = () => {
   return (

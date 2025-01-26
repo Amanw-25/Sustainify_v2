@@ -9,7 +9,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 // Import your image
-import PatientAvatar from '../../assets/images/user.png';
+import PatientAvatar from '../../../assets/images/user.png';
  
 function Testimonial() {
   return (

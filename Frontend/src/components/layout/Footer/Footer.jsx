@@ -1,82 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import logo from '../../assets/images/Sustainify_logo.png'
-import {RiLinkedinFill} from 'react-icons/ri'
-import { AiFillGithub, AiOutlineInstagram} from 'react-icons/ai'
-
-
-const socialLinks = [
-  {
-    path: "https://www.linkedin.com/in/amanwairagkar/",
-    icon: <RiLinkedinFill className='group-hover:text-white w-4 h-5'/>,
-  },
-
-  {
-    path: "https://github.com/Amanw-25",
-    icon: <AiFillGithub className='group-hover:text-white w-4 h-5'/>,
-  },
-
-  {
-    path: "https://www.instagram.com/Amanw_25",
-    icon: <AiOutlineInstagram className='group-hover:text-white w-4 h-5'/>,
-  },
-];
-
-const quickLinks01 = [
-  {
-    path: "/home",
-    display: "Home",
-  },
-
-  {
-    path: "/",
-    display: "About Us",
-  },
-
-  {
-    path: "/services",
-    display: "Services",
-  },
-
-  {
-    path: "/",
-    display: "Blog",
-  },
-];
-
-const quickLinks02 = [
-  {
-    path: "/find-a-doctore",
-    display: "Find a Doctor",
-  },
-
-  {
-    path: "/",
-    display: "Request an Appointment",
-  },
-
-  {
-    path: "/",
-    display: "Find a Location",
-  },
-
-  {
-    path: "/",
-    display: "Get a Opinion",
-  },
-];
-
-const quickLinks03 = [
-  {
-    path: "/",
-    display: "Donate",
-  },
-
-  {
-    path: "/contact",
-    display: "Contact Us",
-  },
-];
+import logo from '../../../assets/images/Sustainify_logo.png'
+import { socialLinks } from './sections/content'
+import { quickLinks01 } from './sections/content'
+import { quickLinks02 } from './sections/content'
+import { quickLinks03 } from './sections/content'
 
 const Footer = () => {
   

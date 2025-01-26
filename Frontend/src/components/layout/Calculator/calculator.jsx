@@ -11,18 +11,10 @@ import {
   IconButton,
 } from "@mui/material";
 import {
-  LocalGasStation,
-  ElectricBolt,
-  GasMeter,
-  Flight,
-  LocalFireDepartment,
-  Delete,
-  WaterDrop,
-  DirectionsBus,
-  Train,
-  DirectionsSubway,
   Close as CloseIcon,
 } from "@mui/icons-material";
+import { primaryFields } from "./sections/content";
+import { secondaryFields } from "./sections/content";
 
 const Calculator = () => {
   const [activeTab, setActiveTab] = useState("primary");
@@ -144,97 +136,97 @@ const Calculator = () => {
     }
   };
 
-  const primaryFields = [
-    {
-      key: "petrol",
-      label: "Petrol",
-      unit: "L/month",
-      icon: <LocalGasStation />,
-    },
-    {
-      key: "diesel",
-      label: "Diesel",
-      unit: "L/month",
-      icon: <LocalGasStation />,
-    },
-    {
-      key: "electricity",
-      label: "Electricity",
-      unit: "kWh/month",
-      icon: <ElectricBolt />,
-    },
-    {
-      key: "naturalGas",
-      label: "Natural Gas",
-      unit: "m³/month",
-      icon: <GasMeter />,
-    },
-    { key: "cng", label: "CNG", unit: "kg/month", icon: <GasMeter /> },
-    { key: "flight", label: "Flight", unit: "km/month", icon: <Flight /> },
-    {
-      key: "lpg",
-      label: "LPG",
-      unit: "kg/month",
-      icon: <LocalFireDepartment />,
-    },
-    {
-      key: "fuelOil",
-      label: "Fuel Oil",
-      unit: "L/month",
-      icon: <LocalGasStation />,
-    },
-    {
-      key: "coal",
-      label: "Coal",
-      unit: "kg/month",
-      icon: <LocalFireDepartment />,
-    },
-  ];
+  // const primaryFields = [
+  //   {
+  //     key: "petrol",
+  //     label: "Petrol",
+  //     unit: "L/month",
+  //     icon: <LocalGasStation />,
+  //   },
+  //   {
+  //     key: "diesel",
+  //     label: "Diesel",
+  //     unit: "L/month",
+  //     icon: <LocalGasStation />,
+  //   },
+  //   {
+  //     key: "electricity",
+  //     label: "Electricity",
+  //     unit: "kWh/month",
+  //     icon: <ElectricBolt />,
+  //   },
+  //   {
+  //     key: "naturalGas",
+  //     label: "Natural Gas",
+  //     unit: "m³/month",
+  //     icon: <GasMeter />,
+  //   },
+  //   { key: "cng", label: "CNG", unit: "kg/month", icon: <GasMeter /> },
+  //   { key: "flight", label: "Flight", unit: "km/month", icon: <Flight /> },
+  //   {
+  //     key: "lpg",
+  //     label: "LPG",
+  //     unit: "kg/month",
+  //     icon: <LocalFireDepartment />,
+  //   },
+  //   {
+  //     key: "fuelOil",
+  //     label: "Fuel Oil",
+  //     unit: "L/month",
+  //     icon: <LocalGasStation />,
+  //   },
+  //   {
+  //     key: "coal",
+  //     label: "Coal",
+  //     unit: "kg/month",
+  //     icon: <LocalFireDepartment />,
+  //   },
+  // ];
 
-  const secondaryFields = [
-    {
-      key: "organicWaste",
-      label: "Organic Waste",
-      unit: "kg/month",
-      icon: <Delete />,
-    },
-    {
-      key: "paperWaste",
-      label: "Paper Waste",
-      unit: "kg/month",
-      icon: <Delete />,
-    },
-    {
-      key: "plasticWaste",
-      label: "Plastic Waste",
-      unit: "kg/month",
-      icon: <Delete />,
-    },
-    {
-      key: "waterUsage",
-      label: "Water Usage",
-      unit: "m³/month",
-      icon: <WaterDrop />,
-    },
-    {
-      key: "busUsage",
-      label: "Bus Usage",
-      unit: "km/month",
-      icon: <DirectionsBus />,
-    },
-    {
-      key: "trainUsage",
-      label: "Train Usage",
-      unit: "km/month",
-      icon: <Train />,
-    },
-    {
-      key: "metroUsage",
-      label: "Metro Usage",
-      unit: "km/month",
-      icon: <DirectionsSubway />,
-    },
-  ];
+  // const secondaryFields = [
+  //   {
+  //     key: "organicWaste",
+  //     label: "Organic Waste",
+  //     unit: "kg/month",
+  //     icon: <Delete />,
+  //   },
+  //   {
+  //     key: "paperWaste",
+  //     label: "Paper Waste",
+  //     unit: "kg/month",
+  //     icon: <Delete />,
+  //   },
+  //   {
+  //     key: "plasticWaste",
+  //     label: "Plastic Waste",
+  //     unit: "kg/month",
+  //     icon: <Delete />,
+  //   },
+  //   {
+  //     key: "waterUsage",
+  //     label: "Water Usage",
+  //     unit: "m³/month",
+  //     icon: <WaterDrop />,
+  //   },
+  //   {
+  //     key: "busUsage",
+  //     label: "Bus Usage",
+  //     unit: "km/month",
+  //     icon: <DirectionsBus />,
+  //   },
+  //   {
+  //     key: "trainUsage",
+  //     label: "Train Usage",
+  //     unit: "km/month",
+  //     icon: <Train />,
+  //   },
+  //   {
+  //     key: "metroUsage",
+  //     label: "Metro Usage",
+  //     unit: "km/month",
+  //     icon: <DirectionsSubway />,
+  //   },
+  // ];
 
   const renderFields = (fields) => (
     <Grid container spacing={2}>

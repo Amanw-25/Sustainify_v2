@@ -1,91 +1,23 @@
 import React, { useState, useRef, useContext, createElement } from "react";
 import { NavLink, Link } from "react-router-dom";
-import {
-  FaCloudRain,
-  FaLeaf,
-  FaUsers,
-  FaChartLine,
-  FaTree,
-  FaShoppingCart,
-  FaCalculator,
-  FaAngleDown,
-} from "react-icons/fa";
+import { FaAngleDown } from "react-icons/fa";
 import { BiMenu } from "react-icons/bi";
 import { AiOutlineClose } from "react-icons/ai";
-import logo from "../../assets/images/Sustainify_logo.png";
-import userImg from "../../assets/images/user.png";
-import { Menu, MenuHandler, MenuList, MenuItem, Typography } from "@material-tailwind/react";
+import logo from "../../../assets/images/Sustainify_logo.png";
+import userImg from "../../../assets/images/user.png";
+import {
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Typography,
+} from "@material-tailwind/react";
 import { Box, IconButton, useTheme } from "@mui/material";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import { ColorModeContext, tokens } from "../../theme";
-
-// Navigation Menu Items for Services Dropdown
-const navListMenuItems = [
-  {
-    title: "Weather",
-    description: "Check the latest weather updates",
-    icon: FaCloudRain,
-    path: "/weather/:location",
-  },
-  {
-    title: "Sustainable Practices",
-    description: "Learn about sustainable practices",
-    icon: FaLeaf,
-    path: "/sustainable-practices",
-  },
-  {
-    title: "Eco Community",
-    description: "Join our eco-friendly community",
-    icon: FaUsers,
-    path: "/eco-community",
-  },
-  {
-    title: "Market Trends",
-    description: "Explore the latest market trends",
-    icon: FaChartLine,
-    path: "/market-trends",
-  },
-  {
-    title: "Carbon Footprint",
-    description: "Track your carbon footprint",
-    icon: FaTree,
-    path: "/carbon-footprint-tracker",
-  },
-  {
-    title: "Eco Store",
-    description: "Shop eco-friendly products",
-    icon: FaShoppingCart,
-    path: "/eco-store",
-  },
-  {
-    title: "Carbon Calculator",
-    description: "Calculate your carbon emissions",
-    icon: FaCalculator,
-    path: "/carbon-calculator",
-  },
-];
-
-// Main Navigation Links
-const navLinks = [
-  {
-    path: "/home",
-    display: "Home",
-  },
-  {
-    path: "/about",
-    display: "About Us",
-  },
-  {
-    path: "/services",
-    display: "Services",
-    dropdown: true, // Indicates this item has a dropdown
-  },
-  {
-    path: "/contact",
-    display: "Contact Us",
-  },
-];
+import { ColorModeContext, tokens } from "../../../theme";
+import { navListMenuItems } from "./sections/content";
+import { navLinks } from "./sections/content";
 
 const Header = () => {
   const theme = useTheme();
@@ -99,33 +31,35 @@ const Header = () => {
     setMenuOpen((prev) => !prev);
   };
 
-  const renderDropdownItems = navListMenuItems.map(({ icon, title, description, path }, key) => (
-    <Link to={path} key={key}>
-      <MenuItem className="flex items-center gap-3 rounded-lg w-full p-4 hover:bg-gray-100">
-        <div className="flex items-center justify-center rounded-lg bg-pastelGreen-500 p-4">
-          {createElement(icon, {
-            strokeWidth: 2,
-            className: "h-6 text-gray-900 w-6",
-          })}
-        </div>
-        <div>
-          <Typography
-            variant="h6"
-            color="blue-gray"
-            className="flex items-center text-sm font-bold"
-          >
-            {title}
-          </Typography>
-          <Typography
-            variant="paragraph"
-            className="text-xs font-medium text-blue-gray-500"
-          >
-            {description}
-          </Typography>
-        </div>
-      </MenuItem>
-    </Link>
-  ));
+  const renderDropdownItems = navListMenuItems.map(
+    ({ icon, title, description, path }, key) => (
+      <Link to={path} key={key}>
+        <MenuItem className="flex items-center gap-3 rounded-lg w-full p-4 hover:bg-gray-100">
+          <div className="flex items-center justify-center rounded-lg bg-pastelGreen-500 p-4">
+            {createElement(icon, {
+              strokeWidth: 2,
+              className: "h-6 text-gray-900 w-6",
+            })}
+          </div>
+          <div>
+            <Typography
+              variant="h6"
+              color="blue-gray"
+              className="flex items-center text-sm font-bold"
+            >
+              {title}
+            </Typography>
+            <Typography
+              variant="paragraph"
+              className="text-xs font-medium text-blue-gray-500"
+            >
+              {description}
+            </Typography>
+          </div>
+        </MenuItem>
+      </Link>
+    )
+  );
 
   return (
     <header className="header flex items-center py-0 px-4 bg-white shadow-md sticky top-0 z-50">
@@ -159,9 +93,7 @@ const Header = () => {
                           variant="small"
                           className="text-lg font-Inter font-medium"
                         >
-                          <div
-                            className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 cursor-pointer"
-                          >
+                          <div className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 cursor-pointer">
                             {link.display}
                             <FaAngleDown
                               className={`h-3 w-3 transition-transform ${

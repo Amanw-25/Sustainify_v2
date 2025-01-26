@@ -1,14 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Box, Button, Typography, Avatar, TextField, Grid, Container } from "@mui/material";
-import Home_bg from "../assets/images/Home_bg.jpg";
+import Home_bg from "../../assets/images/Home_bg.jpg";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import userImg from "../assets/images/user.png";
+import userImg from "../../assets/images/user.png";
 
 import EmailIcon from "@mui/icons-material/Email";
-import About from "../components/About/About";
-import Testimonial from "../components/Testimonal/Testimonal";
-import Service from "../components/Service/Service";
+import About from "../layout/About/About";
+import Service from "../layout/Service/Service";
+import Testimonial from "../layout/Testimonal/Testimonal";
+// import About from "../components/layout/About/About";
+// import Testimonial from "../components/layout/Testimonal/Testimonal";
+// import Service from "../components/layout/Service/Service";
 
 const Home = () => {
   return (
