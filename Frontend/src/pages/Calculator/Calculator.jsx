@@ -1,10 +1,10 @@
 import React from 'react'
-import calculator from '../../components/Calculator/calculator'
+import Calculator from '../../components/Calculator/calculator'
 
-const Calculator = () => {
+const CarbonCalculator = () => {
   return (
     <Calculator />
   )
 }
 
-export default Calculator
+export default CarbonCalculator
