@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
         borderRadius: "8px",
         transition: "transform 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
-          transform: "scale(1.05)",
+          transform: "scale(1.02)",
           boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
         },
       }}
