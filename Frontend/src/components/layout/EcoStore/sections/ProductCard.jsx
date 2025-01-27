@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -12,9 +13,14 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 
 const ProductCard = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
 
   const handleFavoriteToggle = () => {
     setIsFavorite(!isFavorite);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/eco-store/${product.id}`);
   };
 
   return (
@@ -30,6 +36,7 @@ const ProductCard = ({ product }) => {
           boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
         },
       }}
+      onClick={handleCardClick}
     >
       <CardMedia
         component="img"
@@ -84,7 +91,10 @@ const ProductCard = ({ product }) => {
           </Button>
 
           <IconButton
-            onClick={handleFavoriteToggle}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteToggle();
+            }}
             sx={{ color: isFavorite ? "red" : "gray" }}
           >
             <FavoriteIcon />

@@ -20,7 +20,7 @@ export const navListMenuItems = [
     title: "Sustainable Practices",
     description: "Learn about sustainable practices",
     icon: FaLeaf,
-    path: "/sustainable-practices",
+    path: "/blog",
   },
   {
     title: "Eco Community",
