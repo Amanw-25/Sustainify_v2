@@ -10,7 +10,7 @@ const userEcommerceSchema = new mongoose.Schema({
       quantity: { type: Number, default: 1 },
     },
   ],
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }], wishlist
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }], 
 });
 
 const UserEcommerce = mongoose.model("UserEcommerce", userEcommerceSchema);

@@ -5,10 +5,10 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePhoto: { type: String, default: '' },
-  carbonFootprint:{
+  carbonFootprint:[{
     type: mongoose.Schema.Types.ObjectId,
     ref:'CarbonFootprint'
-  },
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
