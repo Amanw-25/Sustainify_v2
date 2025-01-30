@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState ,useContext} from "react";
+import { Link,useNavigate } from "react-router-dom";
 import Home_bg from "../../assets/images/Home_bg.jpg";
+import { AuthContext } from "../../context/AuthContext";
+import {toast} from 'react-toastify';
+import { BASE_URL } from "../../config";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,13 +11,49 @@ const Login = () => {
     password: "",
   });
 
+
+  const [loading,setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login submitted", formData);
+    setLoading(true);
+
+    try{
+      const res=await fetch(`${BASE_URL}/auth/login`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(formData)
+      });
+
+      const data=await res.json();
+      if(!res.ok){
+        throw new Error(data.message);
+      }
+
+      dispatch({
+        type:"LOGIN_SUCCESS",
+        payload:{
+          token:data.token
+        }
+      })
+
+      setLoading(false);
+      toast.success("Login Successfull");
+      navigate("/");
+    }
+    catch(error){
+      console.log("Error",error);
+      setLoading(false);
+      toast.error(error.message);
+    }
   };
 
   return (

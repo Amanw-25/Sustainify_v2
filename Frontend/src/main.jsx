@@ -5,6 +5,9 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AuthContextProvider } from "./context/AuthContext";
 
 const Root = () => {
   const [theme, colorMode] = useMode(); 
@@ -15,7 +18,16 @@ const Root = () => {
         <CssBaseline />
         <StrictMode>
           <BrowserRouter>
-            <App />
+            <AuthContextProvider>
+              <ToastContainer
+                theme="dark"
+                position="top-right"
+                autoClose={3000}
+                closeOnClick
+                pauseOnHover={false}
+              />
+              <App />
+            </AuthContextProvider>
           </BrowserRouter>
         </StrictMode>
       </ThemeProvider>

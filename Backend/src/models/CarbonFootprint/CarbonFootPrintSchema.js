@@ -63,6 +63,12 @@ const carbonFootprintSchema = new mongoose.Schema(
       Train: { type: Number, required: true },
       Metro: { type: Number, required: true },
     },
+    PrimaryTotal: {
+      type: Number,
+    },
+    SecondaryTotal: {
+      type: Number,
+    },
     Total: {
       type: Number,
     },
@@ -70,14 +76,17 @@ const carbonFootprintSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const CarbonFootprint = mongoose.model("CarbonFootprint", carbonFootprintSchema);
+const CarbonFootprint = mongoose.model(
+  "CarbonFootprint",
+  carbonFootprintSchema
+);
 
 const factors = {
   Petrol: 2.296,
   Diesel: 2.716,
   Electricity: 0.7132,
   NaturalGas: 0.203,
-  CNG: 2.720,
+  CNG: 2.72,
   Flight: 2.5,
   LPG: 3.014,
   FuelOil: 2.987,
@@ -110,16 +119,50 @@ CarbonFootprint.calculate = async (data) => {
     WaterUsage: data.WaterUsage * factors.WaterUsage,
     PublicTransportUsage: {
       Bus: data.PublicTransportUsage.Bus * factors.PublicTransportUsage.Bus,
-      Train: data.PublicTransportUsage.Train * factors.PublicTransportUsage.Train,
-      Metro: data.PublicTransportUsage.Metro * factors.PublicTransportUsage.Metro,
+      Train:
+        data.PublicTransportUsage.Train * factors.PublicTransportUsage.Train,
+      Metro:
+        data.PublicTransportUsage.Metro * factors.PublicTransportUsage.Metro,
     },
   };
 
-  CarbonData.PublicTransportUsageTotal = Object.values(CarbonData.PublicTransportUsage).reduce((acc, curr) => acc + curr, 0);
+  CarbonData.PublicTransportUsageTotal = Object.values(
+    CarbonData.PublicTransportUsage
+  ).reduce((acc, curr) => acc + curr, 0);
 
-  CarbonData.Total = Object.values(CarbonData)
-    .filter((value) => typeof value === "number") 
-    .reduce((acc, curr) => acc + curr, 0);
+  CarbonData.PrimaryTotal = Object.entries(CarbonData)
+    .filter(
+      ([key, value]) =>
+        typeof value === "number" &&
+        [
+          "Petrol",
+          "Diesel",
+          "Electricity",
+          "NaturalGas",
+          "CNG",
+          "Flight",
+          "LPG",
+          "FuelOil",
+        ].includes(key)
+    )
+    .reduce((acc, [, curr]) => acc + curr, 0);
+
+  CarbonData.SecondaryTotal = Object.entries(CarbonData)
+    .filter(
+      ([key, value]) =>
+        typeof value === "number" &&
+        [
+          "Coal",
+          "OrganicWaste",
+          "PaperWaste",
+          "PlasticWaste",
+          "WaterUsage",
+          "PublicTransportUsageTotal",
+        ].includes(key)
+    )
+    .reduce((acc, [, curr]) => acc + curr, 0);
+
+  CarbonData.Total = CarbonData.PrimaryTotal + CarbonData.SecondaryTotal;
 
   return CarbonData;
 };
