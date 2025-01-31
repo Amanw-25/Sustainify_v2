@@ -4,6 +4,7 @@ import cors from "cors";
 import appconfig from "./config/appConfig.js";
 import Authrouter from "./routes/authRoute.js";
 import carbonFootPrintRouter from "./routes/carbonFootPrintRoute.js";
+import productRouter from "./routes/ProductRoute.js";
 
 export const app = express();
 
@@ -19,3 +20,5 @@ app.use(
 
 app.use("/api/v1/sustainify/auth", Authrouter);
 app.use("/api/v1/sustainify/carbon", carbonFootPrintRouter);
+app.use("/api/v1/sustainify/product", productRouter);
+

@@ -5,8 +5,8 @@ import UserEcommerceSchema from './User/UserEcommerceSchema.js';
 import CarbonFootprint from './CarbonFootprint/CarbonFootPrintSchema.js';
 import BlogPost from './Blog/BlogPost.js';
 import BlogReview from './Blog/BlogReview.js';
-import ProductSchema from './Product/ProductSchema.js';
-import ProductReviewSchema from './Product/ProductReview.js';
+import Product from './Product/ProductSchema.js';
+import ProductReview from './Product/ProductReview.js';
 import EventSchema from './Event/EventSchema.js';
 import EventRatingSchema from './Event/EventRatingSchema.js';
 
@@ -18,8 +18,8 @@ export{
     CarbonFootprint,
     BlogPost,
     BlogReview,
-    ProductSchema,
-    ProductReviewSchema,
+    Product,
+    ProductReview,
     EventSchema,
     EventRatingSchema
 };
