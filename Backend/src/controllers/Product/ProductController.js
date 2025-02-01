@@ -2,18 +2,10 @@ import { Product } from "../../models/index.js";
 import cloudinary from "../../config/cloudinaryConfig.js";
 
 const addProduct = async (req, res) => {
-  const { name, description, price, carbonFootprint, stock, category ,images} =
+  const { name, description, price, carbonFootprint, stock, category } =
     req.body;
 
-  if (
-    !name ||
-    !description ||
-    !price ||
-    !stock ||
-    !category ||
-    !carbonFootprint ||
-    !images 
-  ) {
+  if (!name || !description || !price || !carbonFootprint || !stock || !category) {
     return res.status(400).json({
       status: "Failed",
       message: "All fields, including category, are required",
@@ -28,35 +20,29 @@ const addProduct = async (req, res) => {
   }
 
   try {
-    const images = [];
-
-    for (let i = 0; i < req.files.length; i++) {
-      const file = req.files[i];
-
-      await new Promise((resolve, reject) => {
-        cloudinary.v2.uploader
-          .upload_stream(
-            {
-              folder: "products", // Upload to 'products' folder
-              public_id: `product_${Date.now()}_${i}`, // Dynamic public_id to avoid overwriting
-            },
-            async (error, result) => {
-              if (error) {
-                console.error("Cloudinary Upload Error:", error);
-                return reject(error);
-              }
-
-              images.push({
+    const uploadPromises = req.files.map((file, index) =>
+      new Promise((resolve, reject) => {
+        cloudinary.v2.uploader.upload_stream(
+          {
+            folder: "products",
+            public_id: `product_${Date.now()}_${index}`,
+          },
+          (error, result) => {
+            if (error) {
+              console.error("Cloudinary Upload Error:", error);
+              reject(error);
+            } else {
+              resolve({
                 url: result.secure_url,
                 publicId: result.public_id,
               });
-
-              resolve();
             }
-          )
-          .end(file.buffer);
-      });
-    }
+          }
+        ).end(file.buffer);
+      })
+    );
+
+    const images = await Promise.all(uploadPromises);
 
     const product = new Product({
       name,
@@ -87,7 +73,7 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, stock, category ,images} = req.body;
+  const { name, description, price, stock, category ,carbonFootprint} = req.body;
 
   if (!id) {
     res.status(500).json({
