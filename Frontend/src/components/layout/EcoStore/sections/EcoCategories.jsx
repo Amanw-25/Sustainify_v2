@@ -1,4 +1,6 @@
 import React from "react";
+import { BASE_URL } from "../../../../config.js";
+import { useEffect, useState } from "react";
 import { Typography, Box } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -7,59 +9,32 @@ import "swiper/css/navigation";
 import "./ProductGrid.css";
 
 const EcoCategories = () => {
-  const categories = [
-    {
-      name: "Reusable Products",
-      image:
-        "https://images.unsplash.com/photo-1601979031925-424e53b6caaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Bamboo Products",
-      image:
-        "https://images.unsplash.com/photo-1602143407151-7111542de6e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
-    },
-    {
-      name: "Solar Energy",
-      image:
-        "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Organic Clothing",
-      image:
-        "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Compostable Items",
-      image:
-        "https://images.unsplash.com/photo-1612817288484-6f916006741a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
 
-    {
-      name: "Reusable Products",
-      image:
-        "https://images.unsplash.com/photo-1601979031925-424e53b6caaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Bamboo Products",
-      image:
-        "https://images.unsplash.com/photo-1602143407151-7111542de6e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
-    },
-    {
-      name: "Solar Energy",
-      image:
-        "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Organic Clothing",
-      image:
-        "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-    {
-      name: "Compostable Items",
-      image:
-        "https://images.unsplash.com/photo-1612817288484-6f916006741a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-    },
-  ];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/product/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        if (data.status === "Success") {
+          const uniqueCategories = [
+            ...new Set(data.products.map((product) => product.category)),
+          ];
+          console.log(uniqueCategories);
+          setCategories(uniqueCategories);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   return (
     <Box sx={{ textAlign: "center", my: 4 }}>
@@ -97,7 +72,7 @@ const EcoCategories = () => {
           <SwiperSlide key={index}>
             <Box sx={{ textAlign: "center", p: 2, ml: 4 }}>
               <img
-                src={category.image}
+                src="https://images.unsplash.com/photo-1601979031925-424e53b6caaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
                 alt={category.name}
                 style={{
                   width: "70px",
@@ -111,7 +86,7 @@ const EcoCategories = () => {
                 variant="subtitle1"
                 sx={{ mt: 1, ml: -4, fontWeight: "small" }}
               >
-                {category.name}
+                {category}
               </Typography>
             </Box>
           </SwiperSlide>

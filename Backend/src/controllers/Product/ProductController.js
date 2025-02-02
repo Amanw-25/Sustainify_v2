@@ -2,13 +2,22 @@ import { Product } from "../../models/index.js";
 import cloudinary from "../../config/cloudinaryConfig.js";
 
 const addProduct = async (req, res) => {
-  const { name, description, price, carbonFootprint, stock, category } =
-    req.body;
+  const { 
+    name, 
+    shortdescription, 
+    description, 
+    specifications, 
+    price, 
+    carbonFootprint, 
+    stock, 
+    category, 
+    deliveryEstimate 
+  } = req.body;
 
-  if (!name || !description || !price || !carbonFootprint || !stock || !category) {
+  if (!name || !shortdescription || !description || !price || !carbonFootprint || !stock || !category) {
     return res.status(400).json({
       status: "Failed",
-      message: "All fields, including category, are required",
+      message: "All fields, including short description and category, are required",
     });
   }
 
@@ -46,12 +55,18 @@ const addProduct = async (req, res) => {
 
     const product = new Product({
       name,
+      shortdescription,
       description,
+      specifications: specifications || [], 
       price,
       carbonFootprint,
       stock,
       category,
       images,
+      reviews: [],
+      totalRating: 0,
+      averageRating: 0,
+      deliveryEstimate: deliveryEstimate || "Standard Delivery",
     });
 
     await product.save();
@@ -73,12 +88,22 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, description, price, stock, category ,carbonFootprint} = req.body;
+  const { 
+    name, 
+    shortdescription, 
+    description, 
+    specifications, 
+    price, 
+    stock, 
+    category, 
+    carbonFootprint, 
+    deliveryEstimate 
+  } = req.body;
 
   if (!id) {
-    res.status(500).json({
+    return res.status(400).json({
       status: "Failed",
-      message: "ID not provided",
+      message: "Product ID not provided",
     });
   }
 
@@ -95,44 +120,45 @@ const updateProduct = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       for (let image of product.images) {
-        await cloudinary.v2.uploader.destroy(image.publicId); // Destroy the image from Cloudinary
+        await cloudinary.v2.uploader.destroy(image.publicId);
       }
 
-      for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        await new Promise((resolve, reject) => {
-          cloudinary.v2.uploader
-            .upload_stream(
+      images = await Promise.all(
+        req.files.map((file, index) => 
+          new Promise((resolve, reject) => {
+            cloudinary.v2.uploader.upload_stream(
               {
                 folder: "products",
-                public_id: `product_${Date.now()}_${i}`,
+                public_id: `product_${Date.now()}_${index}`,
               },
-              async (error, result) => {
+              (error, result) => {
                 if (error) {
                   console.error("Cloudinary Upload Error:", error);
-                  return reject(error);
+                  reject(error);
+                } else {
+                  resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                  });
                 }
-
-                images.push({
-                  url: result.secure_url,
-                  publicId: result.public_id,
-                });
-
-                resolve();
               }
-            )
-            .end(file.buffer);
-        });
-      }
+            ).end(file.buffer);
+          })
+        )
+      );
     }
 
     product.name = name || product.name;
+    product.shortdescription = shortdescription || product.shortdescription;
     product.description = description || product.description;
+    product.specifications = specifications || product.specifications;
     product.price = price || product.price;
     product.carbonFootprint = carbonFootprint || product.carbonFootprint;
     product.stock = stock || product.stock;
     product.category = category || product.category;
+    product.deliveryEstimate = deliveryEstimate || product.deliveryEstimate;
     product.images = images;
+    product.updatedAt = Date.now();
 
     await product.save();
 

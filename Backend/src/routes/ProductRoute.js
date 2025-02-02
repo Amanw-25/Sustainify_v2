@@ -10,6 +10,7 @@ import {
   addProductReview,
   updateProductReview,
   deleteProductReview,
+  getProductReviews
 } from "../controllers/Product/ProductreviewController.js";
 import { authenticate } from "../middlewares/verifyToken.js";
 import upload from "../middlewares/upload.js";
@@ -37,5 +38,6 @@ productRouter.get("/:id", getProductById);
 productRouter.post("/review/:productId", authenticate, addProductReview);
 productRouter.put("/review/:reviewId", authenticate, updateProductReview);
 productRouter.delete("/review/:reviewId", authenticate, deleteProductReview);
+productRouter.get("/review/:productId", getProductReviews);
 
 export default productRouter;

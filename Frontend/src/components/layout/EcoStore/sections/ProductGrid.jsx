@@ -2,318 +2,44 @@ import React from "react";
 import { Typography, Box } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { BASE_URL } from "../../../../config.js";
+import { useEffect, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import ProductCard from "./ProductCard";
 import "./ProductGrid.css";
 
-const products = [
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-
-  {
-    id: 1,
-    name: "Eco-Friendly Lamp",
-    description: "Energy-efficient lighting solution.",
-    price: 49.99,
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Lighting",
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    description: "Sustainable and comfortable.",
-    price: 29.99,
-    image:
-      "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    category: "Apparel",
-  },
-  {
-    id: 5,
-    name: "Solar-Powered Charger",
-    description: "Harness the power of the sun.",
-    price: 59.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Energy",
-  },
-  {
-    id: 6,
-    name: "Compostable Food Containers",
-    description: "Eco-friendly and biodegradable.",
-    price: 14.99,
-    image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-    category: "Kitchen",
-  },
-];
-
-const categories = ["Lighting", "Apparel", "Energy", "Kitchen"];
-
 const ProductGrid = () => {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/product/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        if (data.status === "Success") {
+          setProducts(data.products);
+
+          // Extract unique categories from products
+          const uniqueCategories = [
+            ...new Set(data.products.map((product) => product.category)),
+          ];
+          console.log(uniqueCategories);
+          setCategories(uniqueCategories);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <Box sx={{ my: 4 }}>
       <Typography
@@ -337,7 +63,7 @@ const ProductGrid = () => {
         return (
           <Box key={category} sx={{ mb: 5 }}>
             <Typography
-              variant="h3"
+              variant="h4"
               sx={{ mb: 2, ml: 4, fontWeight: "bold", color: "#004d40" }}
             >
               {category} Products
@@ -366,7 +92,7 @@ const ProductGrid = () => {
               }}
             >
               {filteredProducts.map((product) => (
-                <SwiperSlide key={product.id}>
+                <SwiperSlide key={product._id}>
                   <ProductCard product={product} />
                 </SwiperSlide>
               ))}

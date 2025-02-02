@@ -1,5 +1,32 @@
 import { ProductReview } from "../../models/index.js";
 
+export const getProductReviews = async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const reviews = await ProductReview.find({ productId }).populate("userId");
+
+    if(reviews.length === 0) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "No reviews found for this product",
+      });
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "Reviews fetched successfully",
+      reviews,
+    });
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    res.status(500).json({
+      status: "Failed",
+      message: "Error fetching reviews",
+      error: error.message,
+    });
+  }
+}
+
 export const addProductReview = async (req, res) => {
   const userId = req.userId;
   const { comment, rating } = req.body;

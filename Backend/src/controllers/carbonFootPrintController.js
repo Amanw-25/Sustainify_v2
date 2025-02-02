@@ -196,3 +196,4 @@ export const chatWithMistralAI = async (req, res) => {
     });
   }
 };
+

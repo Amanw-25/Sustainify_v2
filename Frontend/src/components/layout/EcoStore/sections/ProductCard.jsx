@@ -20,7 +20,7 @@ const ProductCard = ({ product }) => {
   };
 
   const handleCardClick = () => {
-    navigate(`/eco-store/${product.id}`);
+    navigate(`/eco-store/${product._id}`);
   };
 
   return (
@@ -38,17 +38,18 @@ const ProductCard = ({ product }) => {
       }}
       onClick={handleCardClick}
     >
-      <CardMedia
-        component="img"
-        height="100"
-        image={product.image}
-        alt={product.name}
-        sx={{
-          objectFit: "cover",
-          borderTopLeftRadius: "10px",
-          borderTopRightRadius: "8px",
-        }}
-      />
+    <CardMedia
+      component="img"
+      height="100"
+      image={product.images?.[0]?.url || "fallback-image-url"}
+      alt={product.name}
+      sx={{
+        objectFit: "cover",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "8px",
+      }}
+    />
+
       <CardContent sx={{ padding: "16px" }}>
         <Typography
           gutterBottom

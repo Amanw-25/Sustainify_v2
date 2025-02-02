@@ -17,7 +17,7 @@ const productReviewSchema = new mongoose.Schema({
 productReviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "userId",
-    select: "name photo",
+    select: "name profilePhoto",
   });
 
   next();
