@@ -64,7 +64,7 @@ const ProductCard = ({ product }) => {
           color="text.secondary"
           sx={{ minHeight: "40px" }}
         >
-          {product.description}
+          {product.shortdescription}
         </Typography>
         <Typography variant="h6" sx={{ fontWeight: "bold", color: "#00796b" }}>
           ${product.price}
