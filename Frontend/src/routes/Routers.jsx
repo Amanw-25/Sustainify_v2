@@ -9,6 +9,8 @@ import EcoStore from '../components/pages/Eco-Store';
 import ProductDetails from '../components/layout/EcoStore/sections/ProductDetails/ProductDetails';
 import Blog from "../components/layout/EcoPractice/blogPage";
 import BlogDetails from '../components/layout/EcoPractice/sections/BlogDetails/BlogDetails';
+import TextEditor from '../components/layout/EcoPractice/sections/Post/TextEditor';
+import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/PreviewAndPublish';
 
 
 const Routers = () => {
@@ -27,6 +29,9 @@ const Routers = () => {
       <Route path="/eco-store/:id" element={<ProductDetails />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:id" element={<BlogDetails />} />
+      <Route path="/post-article" element={<TextEditor />} />
+      <Route path="/post-article/:postId/edit" element={<PreviewAndPublish />} />
+
     </Routes>
   );
 };
