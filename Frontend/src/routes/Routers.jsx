@@ -30,7 +30,7 @@ const Routers = () => {
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:id" element={<BlogDetails />} />
       <Route path="/post-article" element={<TextEditor />} />
-      <Route path="/post-article/:postId/edit" element={<PreviewAndPublish />} />
+      <Route path="/post-article/:postId/preview" element={<PreviewAndPublish />} />
 
     </Routes>
   );

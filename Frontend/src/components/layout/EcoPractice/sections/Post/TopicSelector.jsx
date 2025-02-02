@@ -25,7 +25,7 @@ const TopicSelector = ({ postData, setPostData }) => {
 
   return (
     <Box sx={styles.topicsSection}>
-      <Typography variant="h6">
+      <Typography variant="h3" sx={styles.topicsHeading}>
         Add or change topics (up to 5) so readers know what your story is about
       </Typography>
       <Box sx={styles.topicsContainer}>

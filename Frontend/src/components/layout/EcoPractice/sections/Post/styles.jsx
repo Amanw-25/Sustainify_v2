@@ -82,6 +82,11 @@ export const styles = {
   },
   imageButton: {
     marginTop: '12px',
+    borderRadius: '20px',
+    border:'1px solid #black',
+    background: 'black',
+    color: 'white',
+    width: '40%',
   },
   topicsSection: {
     marginTop: '24px',

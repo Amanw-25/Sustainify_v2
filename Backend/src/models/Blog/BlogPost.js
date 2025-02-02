@@ -5,6 +5,7 @@ const blogPostSchema = new mongoose.Schema({
   kicker: { type: String, required: true },
   content: { type: String, required: true },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  previewImage: { type: String ,default:'https://sb.ecobnb.net/app/uploads/sites/3/2023/05/Green-Blogging-How-to-Start-a-Sustainable-Living-Blog-1-1170x490.jpg'},
   isMemberOnly: { type: Boolean, default: false },
   tags: [{ type: String }],
   readTime: { type: String },

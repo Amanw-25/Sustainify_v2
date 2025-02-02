@@ -1,139 +1,104 @@
-import React, { useState } from "react";
-import { FaHeart, FaShare, FaHandsClapping, FaBookmark } from "react-icons/fa6"; // Corrected icons
+import React, { useState, useEffect } from "react";
+import { FaHeart, FaShare, FaHandsClapping, FaBookmark } from "react-icons/fa6";
 import { Typography, IconButton, Divider } from "@mui/material";
+import { BASE_URL } from "../../../../../config.js";
 import { FaStar } from "react-icons/fa";
 import CommentSection from "./comment";
 import Disclamier from "./Disclamier";
+import { useParams } from "react-router-dom";
 
-const ArticleDetails = () => {
-  const [likes, setLikes] = useState(124); // Dummy likes count
-  const [claps, setClaps] = useState(89); // Dummy claps count
+const BlogDetails = () => {
+  const { id } = useParams();
+  const [article, setArticle] = useState(null);
+  const [likes, setLikes] = useState(0);
+  const [claps, setClaps] = useState(0);
 
-  const article = {
-    title: "The Future of Sustainability in Tech",
-    subtitle: "Innovative Solutions for a Greener Tomorrow",
-    kicker: "How technology is shaping a sustainable future.",
-    author: "John Doe",
-    publishedDate: "2025-01-27",
-    readTime: "5 min read", // Added read time
-    isMemberOnly: true, // Added member-only flag
-    images: [
-      "https://images.unsplash.com/photo-1506748686215-33b1bcd8a9e6?w=800",
-      "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*0hbbA5oYhu17VDnUc7Ff-g.gif",
-    ],
-    content: `
-      <p>The tech industry is making significant strides toward sustainability. From the shift to renewable energy sources to the creation of more efficient devices, the future of sustainability in tech is bright. In this article, we explore the role of technology in promoting a sustainable future.</p>
-      <img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*0hbbA5oYhu17VDnUc7Ff-g.gif" alt="Renewable Energy" style="width: 100%; height: auto; margin: 24px 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
-      <h2>Why Sustainability Matters</h2>
-      <p>As the global population continues to grow, the demand for energy, food, and resources increases. The technology industry plays a pivotal role in addressing these challenges by creating innovations that reduce waste and conserve energy.</p>
-      <h3>Technological Innovations Driving Change</h3>
-      <ul>
-        <li>Renewable Energy Solutions</li>
-        <li>Energy-Efficient Devices</li>
-        <li>Sustainable Manufacturing Practices</li>
-      </ul>
-      <blockquote style="background: #f9fafb; padding: 16px; border-left: 4px solid #3b82f6; font-style: italic; margin: 24px 0;">
-        "Technology can either be the problem or part of the solution for sustainability."
-      </blockquote>
-      <img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*0hbbA5oYhu17VDnUc7Ff-g.gif" alt="Sustainable Tech" style="width: 100%; height: auto; margin: 24px 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
-      <p>As we move forward, the integration of sustainable practices into tech development will be essential to ensure a greener tomorrow. With continued innovation, we can achieve a balance between technology and sustainability.</p>
-      
-    `,
-    tags: ["Sustainability", "Technology", "Innovation"],
-    rating: 4.8,
-  };
+  useEffect(() => {
+    const fetchArticleDetails = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/blog/getSingleBlogPost/${id}`);
+        const data = await response.json();
+        if (data.success && data.data) {
+          const articleData = data.data;
+          setArticle(articleData);
+          setLikes(articleData.likes || 0);
+          setClaps(0); // Reset claps if no initial data available
+        }
+      } catch (err) {
+        console.error("Error fetching article", err);
+      }
+    };
+    if (id) {
+      fetchArticleDetails();
+    }
+  }, [id]);
 
-  // Handle like button click
   const handleLike = () => {
     setLikes((prev) => prev + 1);
   };
 
-  // Handle clap button click
   const handleClap = () => {
     setClaps((prev) => prev + 1);
   };
 
+  if (!article) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <section style={{ background: "white", padding: "60px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        {/* Article Header */}
-        {article.isMemberOnly == true && (
+        {article.isMemberOnly && (
           <span style={{ display: "inline-flex", alignItems: "center" }}>
-            <FaStar
-              style={{ color: "#F6BE14", fontSize: "24px", marginRight: "8px" }}
-            />
+            <FaStar style={{ color: "#F6BE14", fontSize: "24px", marginRight: "8px" }} />
             Member only story
           </span>
         )}
 
         <Divider style={{ margin: "16px 0" }} />
         <div style={{ textAlign: "left", marginBottom: "32px" }}>
-          <Typography
-            variant="h1"
-            style={{ fontWeight: "bold", marginBottom: "8px" }}
-          >
-            {article.title}
+          <Typography variant="h1" style={{ fontWeight: "bold", marginBottom: "8px" }}>
+            {article.title || "No title available"}
           </Typography>
-          <Typography
-            variant="h3"
-            style={{ color: "#6b7280", marginBottom: "16px" }}
-          >
-            {article.subtitle}
+          <Typography variant="h3" style={{ color: "#6b7280", marginBottom: "16px" }}>
+            {article.kicker || "No subtitle available"}
           </Typography>
           <Typography variant="subtitle1" style={{ color: "#6b7280" }}>
-            By {article.author} | {article.publishedDate} | {article.readTime}
+            By {article.author.name || "Unknown author"} | {new Date(article.createdAt).toLocaleDateString() || "Unknown date"} | {article.readTime || "N/A"} min read
           </Typography>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            {article.tags.map((tag, index) => (
-              <span
-                key={index}
-                style={{
-                  background: "#B9B1AF",
-                  padding: "4px 12px",
-                  borderRadius: "9999px",
-                  fontSize: "14px",
-                  color: "#374151",
-                  marginRight: "8px",
-                }}
-              >
-                {tag}
-              </span>
-            ))}
+            {article.tags && article.tags.length > 0 ? (
+              article.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  style={{
+                    background: "#B9B1AF",
+                    padding: "4px 12px",
+                    borderRadius: "9999px",
+                    fontSize: "14px",
+                    color: "#374151",
+                    marginRight: "8px",
+                  }}
+                >
+                  {tag}
+                </span>
+              ))
+            ) : (
+              <span>No tags available</span>
+            )}
           </div>
         </div>
 
-        {/* Social Actions at the Top */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "24px",
-            marginTop: "16px",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", marginTop: "16px" }}>
           <div style={{ display: "flex", gap: "16px" }}>
-            <IconButton
-              color="primary"
-              onClick={handleLike}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
-            >
+            <IconButton color="primary" onClick={handleLike} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <FaHeart style={{ color: "#ef4444" }} />
               <Typography variant="body1">{likes}</Typography>
             </IconButton>
-            <IconButton
-              color="primary"
-              onClick={handleClap}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
-            >
+            <IconButton color="primary" onClick={handleClap} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <FaHandsClapping style={{ color: "#3b82f6" }} />
               <Typography variant="body1">{claps}</Typography>
             </IconButton>
@@ -149,36 +114,27 @@ const ArticleDetails = () => {
           </div>
         </div>
 
-        {/* Article Images */}
         <div style={{ marginBottom: "32px" }}>
-          {article.images.map((img, index) => (
+          {article.previewImage ? (
             <img
-              key={index}
-              src={img}
-              alt={`Article Image ${index + 1}`}
+              src={article.previewImage}
+              alt="Preview"
               style={{
-                width: "50%",
+                width: "100%",
                 height: "auto",
                 borderRadius: "8px",
                 boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                 marginBottom: "24px",
               }}
             />
-          ))}
+          ) : (
+            <div>No preview image available</div>
+          )}
         </div>
 
-        {/* Article Content */}
-        <div
-          style={{
-            lineHeight: "1.6",
-            fontSize: "18px",
-            maxHeight: article.isMemberOnly ? "100px" : "none", // Limit height for member-only
-            overflow: article.isMemberOnly ? "hidden" : "visible", // Hide overflow for member-only
-            position: "relative",
-          }}
-        >
-          <div dangerouslySetInnerHTML={{ __html: article.content }} />
-          {article.isMemberOnly == true && (
+        <div style={{ lineHeight: "1.6", fontSize: "18px", maxHeight: article.isMemberOnly ? "100px" : "none", overflow: article.isMemberOnly ? "hidden" : "visible", position: "relative" }}>
+          <div dangerouslySetInnerHTML={{ __html: article.content || "No content available" }} />
+          {article.isMemberOnly && (
             <div
               style={{
                 position: "absolute",
@@ -193,11 +149,11 @@ const ArticleDetails = () => {
           )}
         </div>
 
-        {article.isMemberOnly == true && <Disclamier />}
+        {article.isMemberOnly && <Disclamier />}
         <CommentSection />
       </div>
     </section>
   );
 };
 
-export default ArticleDetails;
+export default BlogDetails;

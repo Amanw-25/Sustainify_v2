@@ -4,6 +4,11 @@ import { FaUserAlt, FaRegClock } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const BlogCard = ({ blog, index }) => {
+  // Log blog data to verify the structure
+
+  // Check if the author data exists
+  const authorName = blog?.author?.name || "Unknown Author"; // Default value if author or name is missing
+
   return (
     <Paper
       elevation={3}
@@ -22,7 +27,7 @@ const BlogCard = ({ blog, index }) => {
     >
       {/* Blog Image */}
       <img
-        src={blog.image}
+        src={blog.previewImage} // Use the correct property 'previewImage'
         alt={blog.title}
         style={{
           width: "100%",
@@ -48,7 +53,7 @@ const BlogCard = ({ blog, index }) => {
         variant="h6"
         style={{ color: "#6b7280", marginBottom: "16px" }}
       >
-        {blog.subtitle}
+        {blog.kicker} {/* Display kicker as the subtitle */}
       </Typography>
 
       {/* Author, Date, Read Time */}
@@ -66,7 +71,7 @@ const BlogCard = ({ blog, index }) => {
           }}
         >
           <FaUserAlt style={{ marginRight: "8px" }} />
-          {blog.author}
+          {authorName} {/* Display the author's name or "Unknown Author" */}
         </Typography>
         <Typography
           variant="body2"
@@ -77,13 +82,13 @@ const BlogCard = ({ blog, index }) => {
           }}
         >
           <FaRegClock style={{ marginRight: "8px" }} />
-          {blog.readTime}
+          {blog.readTime} min read
         </Typography>
       </Box>
 
       {/* Tags */}
       <Box style={{ marginBottom: "16px" }}>
-        {blog.tags.map((tag, idx) => (
+        {blog.tags && blog.tags.map((tag, idx) => (
           <Chip
             key={idx}
             label={tag}
@@ -98,7 +103,7 @@ const BlogCard = ({ blog, index }) => {
       </Box>
 
       {/* Read More Button */}
-      <Link to={`/blog/${index}`} style={{ textDecoration: "none" }}>
+      <Link to={`/blog/${blog._id}`} style={{ textDecoration: "none" }}>
         <Button
           variant="outlined"
           color="primary"
