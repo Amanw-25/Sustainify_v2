@@ -6,15 +6,38 @@ import {
   updateBlogPost,
   deleteBlogPost,
 } from "../controllers/Blog/BlogController.js";
+import {
+  createBlogReview,
+  getBlogReviews,
+  updateBlogReview,
+} from "../controllers/Blog/BlogReviewController.js";
 import { authenticate } from "../middlewares/verifyToken.js";
 import upload from "../middlewares/upload.js";
 
 const BlogRouter = express.Router();
 
-BlogRouter.post("/createBlogPost",upload.array('previewImage'), authenticate, createBlogPost);
+
+// Blog
+BlogRouter.post(
+  "/createBlogPost",
+  upload.array("previewImage"),
+  authenticate,
+  createBlogPost
+);
 BlogRouter.get("/getBlogPosts", getBlogPosts);
 BlogRouter.get("/getSingleBlogPost/:id", getSingleBlogPost);
-BlogRouter.put("/updateBlogPost/:id", upload.array('previewImage'),authenticate, updateBlogPost);
+BlogRouter.put(
+  "/updateBlogPost/:id",
+  upload.array("previewImage"),
+  authenticate,
+  updateBlogPost
+);
 BlogRouter.delete("/deleteBlogPost/:id", authenticate, deleteBlogPost);
+
+
+// Blog Reviews
+BlogRouter.post("/createBlogReview/:id", authenticate, createBlogReview);
+BlogRouter.get("/getBlogReviews/:blogPostId", getBlogReviews);
+BlogRouter.put("/updateBlogReview/:reviewId", authenticate, updateBlogReview);
 
 export default BlogRouter;

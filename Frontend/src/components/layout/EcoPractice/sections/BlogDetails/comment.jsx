@@ -1,65 +1,81 @@
-import React ,{useState}from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
-
   TextField,
   Button,
   Avatar,
 } from "@mui/material";
 
+const CommentSection = ({ blogId }) => {
+  const [comment, setComment] = useState(""); 
+  const [comments, setComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-const CommentSection = () => {
-  const [comment, setComment] = useState(""); // State for comment input
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      name: "Alice Smith",
-      img: "https://randomuser.me/api/portraits/women/44.jpg",
-      comment: "Great article! Very insightful.",
-    },
-    {
-      id: 2,
-      name: "Bob Johnson",
-      img: "https://randomuser.me/api/portraits/men/32.jpg",
-      comment: "Loved the examples provided.",
-    },
-    {
-      id: 3,
-      name: "Charlie Brown",
-      img: "https://randomuser.me/api/portraits/men/45.jpg",
-      comment: "This is exactly what I needed to read!",
-    },
-  ]);
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(
+          `http://localhost:5130/api/v1/sustainify/blog/getBlogReviews/${blogId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        const data = await response.json();
+        setComments(data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    if (blogId) {
+      fetchComments();
+    }
+  }, [blogId]);
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
   };
 
-  // Handle adding a new comment
-  const handleAddComment = () => {
-    if (comment.trim()) {
-      const newComment = {
-        id: comments.length + 1,
-        name: "You",
-        img: "https://randomuser.me/api/portraits/men/1.jpg",
-        comment: comment.trim(),
-      };
-      setComments([...comments, newComment]);
-      setComment("");
+  const handleAddComment = async () => {
+    if (comment.trim() && !isLoading) {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(
+          `http://localhost:5130/api/v1/sustainify/blog/createBlogReview/${blogId}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ comment: comment.trim() })
+          }
+        );
+
+        const newComment = await response.json();
+        setComments([...comments, newComment]);
+        setComment("");
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   
   return (
     <div style={{ padding: "24px", borderRadius: "8px" }}>
-      <Typography
-        variant="h4"
-        style={{
-          fontWeight: "bold",
-          marginTop: "16px",
-          marginBottom: "24px",
-          color: "#374151",
-        }}
-      >
+      <Typography variant="h4" style={{
+        fontWeight: "bold",
+        marginTop: "16px",
+        marginBottom: "24px",
+        color: "#374151",
+      }}>
         Comments
       </Typography>
       <TextField
@@ -80,6 +96,7 @@ const CommentSection = () => {
         variant="contained"
         color="primary"
         onClick={handleAddComment}
+        disabled={isLoading}
         style={{
           marginBottom: "32px",
           backgroundColor: "#3b82f6",
@@ -90,10 +107,9 @@ const CommentSection = () => {
           borderRadius: "8px",
         }}
       >
-        Add Comment
+        {isLoading ? "Posting..." : "Add Comment"}
       </Button>
 
-      {/* Display Comments */}
       {comments.length > 0 ? (
         comments.map((comment) => (
           <div
@@ -110,8 +126,8 @@ const CommentSection = () => {
             }}
           >
             <Avatar
-              src={comment.img}
-              alt={comment.name}
+              src={comment.userProfileImage || "https://randomuser.me/api/portraits/men/1.jpg"}
+              alt={comment.userName}
               style={{
                 width: "48px",
                 height: "48px",
@@ -127,7 +143,7 @@ const CommentSection = () => {
                   marginBottom: "4px",
                 }}
               >
-                {comment.name}
+                {comment.userName}
               </Typography>
               <Typography
                 variant="body1"
