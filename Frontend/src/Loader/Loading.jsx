@@ -1,12 +1,18 @@
-import React from 'react'
-import HashLoader from 'react-spinners/HashLoader'
+import React from "react";
+import { ClipLoader } from "react-spinners";
 
 const Loading = () => {
   return (
-    <div className="flex justify-center items-center w-full h-full">
-      <HashLoader color="#123abc" loading={true} size={50} />
+    <div className="w-full mt-10 flex justify-center">
+      <ClipLoader
+        color="#000000"
+        loading={true}
+        size={70}
+        width={8}
+        speedMultiplier={1.5}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

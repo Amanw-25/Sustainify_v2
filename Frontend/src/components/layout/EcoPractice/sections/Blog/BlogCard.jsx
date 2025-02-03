@@ -4,15 +4,15 @@ import { FaUserAlt, FaRegClock } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const BlogCard = ({ blog, index }) => {
-  // Log blog data to verify the structure
-
-  // Check if the author data exists
-  const authorName = blog?.author?.name || "Unknown Author"; // Default value if author or name is missing
+  const authorName = blog?.author?.name || "Unknown Author"; 
 
   return (
     <Paper
       elevation={3}
       style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
         padding: "16px",
         borderRadius: "16px",
         backgroundColor: "#ffffff",
@@ -25,9 +25,8 @@ const BlogCard = ({ blog, index }) => {
         },
       }}
     >
-      {/* Blog Image */}
       <img
-        src={blog.previewImage} // Use the correct property 'previewImage'
+        src={blog.previewImage}
         alt={blog.title}
         style={{
           width: "100%",
@@ -38,25 +37,28 @@ const BlogCard = ({ blog, index }) => {
         }}
       />
 
-      {/* Blog Content */}
       <Typography
         variant="h5"
         style={{
           fontWeight: "bold",
           color: "#374151",
           marginBottom: "8px",
+          flexGrow: 1,
         }}
       >
         {blog.title}
       </Typography>
       <Typography
         variant="h6"
-        style={{ color: "#6b7280", marginBottom: "16px" }}
+        style={{ 
+          color: "#6b7280", 
+          marginBottom: "16px",
+          minHeight: "50px", 
+        }}
       >
-        {blog.kicker} {/* Display kicker as the subtitle */}
+        {blog.kicker} 
       </Typography>
 
-      {/* Author, Date, Read Time */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -71,7 +73,7 @@ const BlogCard = ({ blog, index }) => {
           }}
         >
           <FaUserAlt style={{ marginRight: "8px" }} />
-          {authorName} {/* Display the author's name or "Unknown Author" */}
+          {authorName} 
         </Typography>
         <Typography
           variant="body2"
@@ -86,14 +88,14 @@ const BlogCard = ({ blog, index }) => {
         </Typography>
       </Box>
 
-      {/* Tags */}
-      <Box style={{ marginBottom: "16px" }}>
+      <Box style={{ marginBottom: "16px", minHeight: "40px" }}>
         {blog.tags && blog.tags.map((tag, idx) => (
           <Chip
             key={idx}
             label={tag}
             style={{
               marginRight: "8px",
+              marginBottom: "4px",
               backgroundColor: "#e5e7eb",
               color: "#374151",
               fontSize: "12px",
@@ -102,8 +104,7 @@ const BlogCard = ({ blog, index }) => {
         ))}
       </Box>
 
-      {/* Read More Button */}
-      <Link to={`/blog/${blog._id}`} style={{ textDecoration: "none" }}>
+      <Link to={`/blog/${blog._id}`} style={{ textDecoration: "none", marginTop: "auto" }}>
         <Button
           variant="outlined"
           color="primary"

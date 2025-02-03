@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Box, Pagination } from "@mui/material";
-import Banner from "./Banner";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../../../../config.js";
+import Banner from "./Banner";
 import Categories from "./Categories";
 import PostArticleButton from "./PostButton";
+import Loading from '../../../../../Loader/Loading.jsx';
 import BlogCard from "./BlogCard";
 
 const Blog = () => {
@@ -12,6 +13,7 @@ const Blog = () => {
   const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const blogsPerPage = 6;
   const totalBlogs = blogs.length;
@@ -32,6 +34,7 @@ const Blog = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     const fetchBlogs = async () => {
       try {
         const response = await fetch(`${BASE_URL}/blog/getBlogPosts`);
@@ -49,10 +52,16 @@ const Blog = () => {
       } catch (err) {
         toast.error("Error fetching blogs");
         console.log(err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchBlogs();
   }, []);
+
+  if (loading) {
+    return <Loading style={{ top: "50%" }} />;
+  }
 
   return (
     <Box style={{ backgroundColor: "#f7fafc", padding: "0" }}>
@@ -72,27 +81,40 @@ const Blog = () => {
           <PostArticleButton />
         </Box>
 
-        <Grid container spacing={3} justifyContent="flex-start">
-          {displayedBlogs.map((blog, index) => (
-            <Grid item xs={12} sm={6} md={4} key={blog._id}> {/* Use unique id for key */}
-              <BlogCard blog={blog} index={index} /> {/* Pass single blog and index */}
+        {displayedBlogs.length === 0 ? (
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            alignItems="center" 
+            height="300px"
+          >
+            <p>No blogs found</p>
+          </Box>
+        ) : (
+          <>
+            <Grid container spacing={3} justifyContent="flex-start">
+              {displayedBlogs.map((blog) => (
+                <Grid item xs={12} sm={6} md={4} key={blog._id}>
+                  <BlogCard blog={blog} />
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
 
-        <Box
-          display="flex"
-          justifyContent="center"
-          style={{ marginTop: "32px" }}
-        >
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            color="primary"
-            shape="rounded"
-          />
-        </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              style={{ marginTop: "32px" }}
+            >
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
+              />
+            </Box>
+          </>
+        )}
       </Box>
     </Box>
   );

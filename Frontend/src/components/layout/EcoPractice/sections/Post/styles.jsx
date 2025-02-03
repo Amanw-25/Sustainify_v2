@@ -103,4 +103,13 @@ export const styles = {
   topicInput: {
     minWidth: '150px',
   },
+  saveDraftButton:{
+    borderRadius: '20px',
+    padding: '10px 30px',
+    fontWeight: 'bold',
+    textTransform: 'none',
+    fontSize: '16px',
+    background: 'black',
+    color: 'white',
+  }
 };

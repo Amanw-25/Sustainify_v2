@@ -13,7 +13,11 @@ import {
 } from '@mui/material';
 import { BASE_URL } from '../../../../../config.js';
 
-const PhoneVerificationDialog = ({ open, onClose }) => {
+const PhoneVerificationDialog = ({ 
+  open, 
+  onClose, 
+  onVerificationSuccess 
+}) => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState('+91');
   const [otp, setOtp] = useState('');
@@ -67,7 +71,7 @@ const PhoneVerificationDialog = ({ open, onClose }) => {
       if (data.success) {
         localStorage.setItem('phoneVerified', 'true');
         onClose();
-        navigate('/'); // Redirect to home page
+        onVerificationSuccess(); 
       } else {
         setError(data.message || 'Invalid OTP');
       }

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FaStar, FaShoppingCart, FaHeart } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { BASE_URL } from "../../../../../config.js";
+import Loading from '../../../../../Loader/Loading.jsx';
+import Error from '../../../../../Error/Error.jsx';
 
 const ProductDetails = () => {
   const [tab, setTab] = useState("details");
@@ -103,8 +105,8 @@ const ProductDetails = () => {
     }
   }, [id, tab]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <Loading />;
+  if (error) return <div><Error/></div>;
   if (!product) return <div>Product not found</div>;
 
   const currentDisplayImage =

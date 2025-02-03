@@ -4,51 +4,76 @@ import cloudinary from "../../config/cloudinaryConfig.js";
 export const createBlogPost = async (req, res) => {
   const user = req.userId;
   try {
-    const { title, kicker, content, isMemberOnly, tags, readTime } = req.body;
+    const {
+      title,
+      kicker,
+      content,
+      isMemberOnly,
+      tags,
+      readTime,
+      previewImage,
+    } = req.body;
 
     if (!title || !kicker || !content || !tags || !readTime) {
       return res.status(400).json({
         success: false,
-        message: "Title, kicker, content are required",
+        message: "Title, kicker, content, tags, and readTime are required",
       });
     }
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        status: "Failed",
-        message: "No files uploaded",
-      });
-    }
+    const DEFAULT_IMAGE =
+      "https://sb.ecobnb.net/app/uploads/sites/3/2023/05/Green-Blogging-How-to-Start-a-Sustainable-Living-Blog-1-1170x490.jpg";
 
-    const uploadPromises = req.files.map(
-      (file, index) =>
-        new Promise((resolve, reject) => {
-          cloudinary.v2.uploader
-            .upload_stream(
-              {
-                folder: "blog",
-                public_id: `blog_${Date.now()}_${index}`,
-              },
-              (error, result) => {
-                if (error) {
-                  console.error("Cloudinary Upload Error:", error);
-                  reject(error);
-                } else {
-                  resolve({
-                    url: result.secure_url,
-                    publicId: result.public_id,
-                  });
+    let finalPreviewImage =
+      previewImage && previewImage.trim() !== "" ? previewImage : DEFAULT_IMAGE;
+
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(
+        (file, index) =>
+          new Promise((resolve, reject) => {
+            cloudinary.v2.uploader
+              .upload_stream(
+                {
+                  folder: "blog",
+                  public_id: `blog_${Date.now()}_${index}`,
+                },
+                (error, result) => {
+                  if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    reject(error);
+                  } else {
+                    resolve({
+                      url: result.secure_url,
+                      publicId: result.public_id,
+                    });
+                  }
                 }
-              }
-            )
-            .end(file.buffer);
-        })
-    );
+              )
+              .end(file.buffer);
+          })
+      );
+
+      try {
+        const uploadedImages = await Promise.all(uploadPromises);
+        if (uploadedImages.length > 0) {
+          finalPreviewImage = uploadedImages[0].url;
+          console.log("Uploaded new image, using:", finalPreviewImage);
+        }
+      } catch (uploadError) {
+        console.error("Error uploading images:", uploadError);
+        return res.status(500).json({
+          success: false,
+          message: "Error uploading image",
+          error: uploadError.message,
+        });
+      }
+    }
 
     const newBlogPost = new BlogPost({
       title,
       kicker,
       content,
+      previewImage: finalPreviewImage,
       author: user,
       isMemberOnly,
       tags,
@@ -124,11 +149,10 @@ export const getSingleBlogPost = async (req, res) => {
   }
 };
 
-
 export const updateBlogPost = async (req, res) => {
   const { id } = req.params;
   const user = req.userId;
-  
+
   try {
     const blogPost = await BlogPost.findOne({ _id: id, author: user });
     if (!blogPost) {
@@ -138,61 +162,58 @@ export const updateBlogPost = async (req, res) => {
       });
     }
 
-    const {
-      title,
-      kicker,
-      content,
-      isMemberOnly,
-      tags,
-      readTime,
-    } = req.body;
+    const { title, kicker, content, isMemberOnly, tags, readTime } = req.body;
 
     let previewImage = blogPost.previewImage;
 
     if (req.files && req.files.length > 0) {
       if (blogPost.previewImage) {
-        const publicId = blogPost.previewImage.split('/').pop().split('.')[0];
+        const publicId = blogPost.previewImage.split("/").pop().split(".")[0];
         await cloudinary.v2.uploader.destroy(publicId);
       }
 
       const uploadResults = await Promise.all(
-        req.files.map((file, index) =>
-          new Promise((resolve, reject) => {
-            cloudinary.v2.uploader.upload_stream(
-              {
-                folder: "blog",
-                public_id: `blog_${Date.now()}_${index}`,
-              },
-              (error, result) => {
-                if (error) {
-                  console.error("Cloudinary Upload Error:", error);
-                  reject(error);
-                } else {
-                  resolve({
-                    url: result.secure_url,
-                    publicId: result.public_id,
-                  });
-                }
-              }
-            ).end(file.buffer);
-          })
+        req.files.map(
+          (file, index) =>
+            new Promise((resolve, reject) => {
+              cloudinary.v2.uploader
+                .upload_stream(
+                  {
+                    folder: "blog",
+                    public_id: `blog_${Date.now()}_${index}`,
+                  },
+                  (error, result) => {
+                    if (error) {
+                      console.error("Cloudinary Upload Error:", error);
+                      reject(error);
+                    } else {
+                      resolve({
+                        url: result.secure_url,
+                        publicId: result.public_id,
+                      });
+                    }
+                  }
+                )
+                .end(file.buffer);
+            })
         )
       );
-      previewImage = uploadResults[0].url;
+      previewImage = (await Promise.all(uploadResults))[0].url;
     }
 
     blogPost.title = title || blogPost.title;
     blogPost.kicker = kicker || blogPost.kicker;
     blogPost.content = content || blogPost.content;
+    blogPost.previewImage = previewImage || blogPost.previewImage;
     blogPost.isMemberOnly = isMemberOnly || blogPost.isMemberOnly;
     blogPost.tags = tags || blogPost.tags;
     blogPost.readTime = readTime || blogPost.readTime;
     blogPost.previewImage = previewImage;
     blogPost.updatedAt = Date.now();
 
-    if (!req.files || req.files.length === 0) {
-      blogPost.previewImage = blogPost.previewImage || 'https://sb.ecobnb.net/app/uploads/sites/3/2023/05/Green-Blogging-How-to-Start-a-Sustainable-Living-Blog-1-1170x490.jpg';
-    }
+    // if (!req.files || req.files.length === 0) {
+    //   blogPost.previewImage = blogPost.previewImage || 'https://sb.ecobnb.net/app/uploads/sites/3/2023/05/Green-Blogging-How-to-Start-a-Sustainable-Living-Blog-1-1170x490.jpg';
+    // }
 
     await blogPost.save();
 
@@ -210,8 +231,6 @@ export const updateBlogPost = async (req, res) => {
     });
   }
 };
-
-
 
 export const deleteBlogPost = async (req, res) => {
   const { id } = req.params;

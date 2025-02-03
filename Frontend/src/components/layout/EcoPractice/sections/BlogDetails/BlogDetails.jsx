@@ -3,9 +3,12 @@ import { FaHeart, FaShare, FaHandsClapping, FaBookmark } from "react-icons/fa6";
 import { Typography, IconButton, Divider } from "@mui/material";
 import { BASE_URL } from "../../../../../config.js";
 import { FaStar } from "react-icons/fa";
+import { toast } from 'react-toastify';
+import { useParams } from "react-router-dom";
+import Loader from '../../../../../Loader/Loading.jsx';
+import Error from '../../../../../Error/Error.jsx';
 import CommentSection from "./comment";
 import Disclamier from "./Disclamier";
-import { useParams } from "react-router-dom";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -22,7 +25,7 @@ const BlogDetails = () => {
           const articleData = data.data;
           setArticle(articleData);
           setLikes(articleData.likes || 0);
-          setClaps(0); // Reset claps if no initial data available
+          setClaps(0);
         }
       } catch (err) {
         console.error("Error fetching article", err);
@@ -41,8 +44,18 @@ const BlogDetails = () => {
     setClaps((prev) => prev + 1);
   };
 
+  const handleShareClick = () => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      toast.success('Blog URL copied to clipboard!');
+    }).catch(err => {
+      toast.error('Failed to copy URL');
+      console.error('Failed to copy URL: ', err);
+    });
+  };
+
   if (!article) {
-    return <div>Loading...</div>;
+    return <div><Loader/></div>;
   }
 
   return (
@@ -105,7 +118,7 @@ const BlogDetails = () => {
           </div>
 
           <div style={{ display: "flex", gap: "16px" }}>
-            <IconButton color="primary">
+            <IconButton color="primary" onClick={handleShareClick}>
               <FaShare style={{ color: "#6b7280" }} />
             </IconButton>
             <IconButton color="primary">

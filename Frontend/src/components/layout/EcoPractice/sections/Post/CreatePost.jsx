@@ -1,27 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { Button, Box, TextField, FormControlLabel, Checkbox, Chip } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
-import { editorModules, editorFormats } from './editorConfig';
-import { styles } from './styles.jsx';
+import React, { useState, useEffect } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import {
+  Button,
+  Box,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Chip,
+  Alert,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { editorModules, editorFormats } from "./editorConfig";
+import { styles } from "./styles.jsx";
 
 const CreatePost = () => {
   const navigate = useNavigate();
   const [postData, setPostData] = useState({
-    title: '',
-    kicker: '',
-    content: '',
+    title: "",
+    kicker: "",
+    content: "",
     isMemberOnly: false,
     tags: [],
-    previewImage: null
+    previewImage: null,
   });
-  const [tagInput, setTagInput] = useState('');
+  const [tagInput, setTagInput] = useState("");
+  const [errors, setErrors] = useState({});
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
 
-  // Check if there is an existing draft in localStorage
+  let draftId = localStorage.getItem("draft-id");
+
   useEffect(() => {
-    const draftId = localStorage.getItem('draft-id');
     if (draftId) {
       const savedDraft = JSON.parse(localStorage.getItem(draftId));
       if (savedDraft) {
@@ -30,69 +40,119 @@ const CreatePost = () => {
     }
   }, []);
 
+  const validateFields = () => {
+    const newErrors = {};
+    let errorMessage = [];
+
+    if (!postData.title.trim()) {
+      newErrors.title = true;
+      errorMessage.push("Title");
+    }
+    if (!postData.kicker.trim()) {
+      newErrors.kicker = true;
+      errorMessage.push("Kicker");
+    }
+    if (!postData.content.trim() || postData.content === '<p><br></p>') {
+      newErrors.content = true;
+      errorMessage.push("Content");
+    }
+    if (postData.tags.length === 0) {
+      newErrors.tags = true;
+      errorMessage.push("Tags");
+    }
+
+    setErrors(newErrors);
+    return { isValid: errorMessage.length === 0, errorMessage };
+  };
+
   const handleEditorChange = (value) => {
-    setPostData(prev => ({ ...prev, content: value }));
+    setPostData((prev) => ({ ...prev, content: value }));
+    if (errors.content) {
+      setErrors((prev) => ({ ...prev, content: false }));
+    }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setPostData(prev => ({ ...prev, [name]: value }));
+    setPostData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleTagInputKeyPress = (e) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
+    if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
-      setPostData(prev => ({
+      setPostData((prev) => ({
         ...prev,
-        tags: [...new Set([...prev.tags, tagInput.trim()])]
+        tags: [...new Set([...prev.tags, tagInput.trim()])],
       }));
-      setTagInput('');
+      setTagInput("");
+      if (errors.tags) {
+        setErrors((prev) => ({ ...prev, tags: false }));
+      }
     }
   };
 
   const handleDeleteTag = (tagToDelete) => {
-    setPostData(prev => ({
+    setPostData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToDelete)
+      tags: prev.tags.filter((tag) => tag !== tagToDelete),
     }));
   };
 
-  // Save or update Draft in Local Storage
   const handleSaveDraft = () => {
-    const draftId = localStorage.getItem('draft-id') || uuidv4().substring(0, 12); // Get existing draft ID or generate a new one
-    localStorage.setItem('draft-id', draftId); // Store the draft ID for consistency
-
-    // Save or update the draft in localStorage
+    draftId = localStorage.getItem("draft-id");
+    if (!draftId) {
+      draftId = uuidv4().substring(0, 12);
+      localStorage.setItem("draft-id", draftId);
+    }
     localStorage.setItem(draftId, JSON.stringify(postData));
-    console.log("Draft Saved or Updated:", postData);
   };
 
-  // Handle the next step
   const handleNext = () => {
-    const postId = uuidv4().substring(0, 12);  // Generate unique postId for the draft
-    localStorage.setItem(`draft-${postId}`, JSON.stringify(postData)); // Save post data with unique ID
-    navigate(`/post-article/${postId}/preview`); // Redirect to preview page with the postId in the URL
+    const { isValid, errorMessage } = validateFields();
+    
+    if (isValid) {
+      navigate(`/post-article/${draftId}/preview`);
+    } else {
+      setShowValidationAlert(true);
+      setTimeout(() => setShowValidationAlert(false), 5000);
+    }
   };
 
   return (
     <Box sx={styles.container}>
+      {showValidationAlert && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Please fill in all required fields: {errors && Object.keys(errors).length > 0 && 
+          Object.keys(errors).filter(key => errors[key]).join(", ")}
+        </Alert>
+      )}
+
       <TextField
+        required
         fullWidth
         name="title"
         placeholder="Title"
         value={postData.title}
         onChange={handleInputChange}
         variant="standard"
+        error={errors.title}
+        helperText={errors.title ? "Title is required" : ""}
         sx={styles.titleInput}
       />
 
       <TextField
+        required
         fullWidth
         name="kicker"
         placeholder="Kicker - A brief attention-grabbing subtitle"
         value={postData.kicker}
         onChange={handleInputChange}
         variant="standard"
+        error={errors.kicker}
+        helperText={errors.kicker ? "Kicker is required" : ""}
         sx={styles.kickerInput}
       />
 
@@ -106,43 +166,55 @@ const CreatePost = () => {
           />
         ))}
         <TextField
+          required
           placeholder="Add tags (press Enter)"
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}
           onKeyPress={handleTagInputKeyPress}
           variant="standard"
+          error={errors.tags}
+          helperText={errors.tags ? "At least one tag is required" : ""}
           sx={styles.tagInput}
         />
       </Box>
 
-      <ReactQuill
-        value={postData.content}
-        onChange={handleEditorChange}
-        modules={editorModules}
-        formats={editorFormats}
-        placeholder="Start writing your story..."
-        style={styles.editor}
-      />
+      <Box sx={{ border: errors.content ? '1px solid #d32f2f' : 'none', borderRadius: 1, mb: 1 }}>
+        <ReactQuill
+          value={postData.content}
+          onChange={handleEditorChange}
+          modules={editorModules}
+          formats={editorFormats}
+          placeholder="Start writing your story... (required)"
+          style={styles.editor}
+        />
+      </Box>
+      {errors.content && (
+        <Box sx={{ color: '#d32f2f', fontSize: '0.75rem', ml: 2, mt: 0.5 }}>
+          Content is required
+        </Box>
+      )}
 
       <FormControlLabel
         control={
           <Checkbox
             checked={postData.isMemberOnly}
-            onChange={(e) => setPostData(prev => ({ 
-              ...prev, 
-              isMemberOnly: e.target.checked 
-            }))}
+            onChange={(e) =>
+              setPostData((prev) => ({
+                ...prev,
+                isMemberOnly: e.target.checked,
+              }))
+            }
           />
         }
         label="Member-only content"
         sx={styles.memberOnlyToggle}
       />
 
-      <Box sx={styles.buttonContainer}>
+      <Box sx={{display: 'flex', justifyContent: 'space-between', mt: 2}}>
         <Button
           variant="contained"
           color="primary"
-          onClick={handleSaveDraft} // Save Draft functionality
+          onClick={handleSaveDraft}
           sx={styles.saveDraftButton}
         >
           Save Draft
@@ -151,7 +223,7 @@ const CreatePost = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={handleNext} // Next Button (save draft and go to next page)
+          onClick={handleNext}
           sx={styles.publishButton}
         >
           Next
