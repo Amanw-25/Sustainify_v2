@@ -1,7 +1,8 @@
 import { useContext, useEffect, createContext, useReducer } from "react";
 
 const initialState = {
-  token: localStorage.getItem("token") || null
+  token: localStorage.getItem("token") || null,
+  role: localStorage.getItem("role") || null
 };
 
 export const AuthContext = createContext(initialState);
@@ -11,16 +12,19 @@ const authReducer = (state, action) => {
     case 'LOGIN_START':
       return {
         token: null,
+        role: null
       };
 
     case 'LOGIN_SUCCESS':
       return {
         token: action.payload.token,
+        role: action.payload.role
       };
 
     case 'LOGOUT':
       return {
         token: null,
+        role: null
       };
 
     default:
@@ -34,10 +38,11 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('token', state.token);
+    localStorage.setItem('role', state.role);
   },[state.token]);
   
   return (
-    <AuthContext.Provider value={{token: state.token, dispatch }}>
+    <AuthContext.Provider value={{token: state.token, role : state.role ,dispatch }}>
       {children}
     </AuthContext.Provider>
   );

@@ -10,6 +10,7 @@ import ProductReview from './Product/ProductReview.js';
 import EventDetails from './Event/EventSchema.js';
 import EventRating from './Event/EventRatingSchema.js';
 import EventRequest from './Event/EventRequestSchema.js';
+import Meeting from './Meeting/Meeting.js';
 
 export{
     User,
@@ -23,5 +24,7 @@ export{
     ProductReview,
     EventDetails,
     EventRating,
-    EventRequest
+    EventRequest,
+    Meeting
+
 };

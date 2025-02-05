@@ -1,9 +1,9 @@
 import React from 'react'
-import EventsPage from '../layout/Events/EventPage'
+import Events from '../layout/Events/Events'
 
 const Event = () => {
   return (
-    <div><EventsPage/></div>
+    <div><Events/></div>
   )
 }
 

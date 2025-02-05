@@ -1,4 +1,4 @@
-import { app } from "./app.js";
+import { server } from "./app.js";
 import appconfig from "./config/appConfig.js";
 import connectdb from "./database/dbconnect.js";
 
@@ -6,20 +6,13 @@ import connectdb from "./database/dbconnect.js";
   try {
     await connectdb();
 
-    app.get("/", (_, res) => {
-      res.status(200).json({
-        status: "success",
-      });
-    });
-
-    const appServer = app.listen(appconfig.PORT, () => {
+    server.listen(appconfig.PORT, () => {
       console.log(
         `Server started at http://localhost:${appconfig.PORT || 3030}/`
       );
     });
   } catch (error) {
-    console.log(error);
+    console.error("Server initialization error:", error);
+    process.exit(1);
   }
 })();
-
-

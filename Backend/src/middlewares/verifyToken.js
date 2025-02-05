@@ -17,6 +17,7 @@ export const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, appconfig.JWT_SECRET);
 
     req.userId = decoded.id;
+    req.role = decoded.role;
 
     next();
   } catch (error) {

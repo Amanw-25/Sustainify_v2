@@ -3,7 +3,7 @@ import{ User }from "../models/index.js";
 import jwt from "jsonwebtoken";
 
 const genrateToken = (user) => {
-  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "30d" });
+  return jwt.sign({ id: user._id ,role: user.role }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
 export const register = async (req, res) => {
@@ -74,6 +74,7 @@ export const login = async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
+        role: user.role,
         profilePhoto: user.profilePhoto,
       },
     });

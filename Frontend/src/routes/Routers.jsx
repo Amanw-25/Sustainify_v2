@@ -13,7 +13,10 @@ import TextEditor from '../components/layout/EcoPractice/sections/Post/TextEdito
 import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/PreviewAndPublish';
 import Event from '../components/pages/Event';
 import AdminPage from '../components/pages/AdminPage';
-
+import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
+import RequestEvent from '../components/layout/Events/section/Event/RequestEvent';
+import AdminApproval from '../components/layout/AdminDashboard/AdminApproval';
+import ProtectedRoute from './ProtectedRoute';
 
 
 const Routers = () => {
@@ -36,7 +39,17 @@ const Routers = () => {
       <Route path="/post-article/:postId/preview" element={<PreviewAndPublish />} />
 
       <Route path="/event" element={<Event />} />
+      <Route path="/event-details/:id" element={<EventsDetails />} />
+      <Route path="/request-event/:eventId" element={<RequestEvent />} />
       <Route path="/admin" element={<AdminPage />} />
+      <Route 
+        path="/admin-approval" 
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminApproval />
+          </ProtectedRoute>
+        } />
+
 
     </Routes>
   );

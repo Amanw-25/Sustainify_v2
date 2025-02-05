@@ -41,7 +41,8 @@ const Login = () => {
       dispatch({
         type:"LOGIN_SUCCESS",
         payload:{
-          token:data.token
+          token:data.token,
+          role:data.user.role
         }
       })
 
