@@ -7,8 +7,9 @@ import BlogPost from './Blog/BlogPost.js';
 import BlogReview from './Blog/BlogReview.js';
 import Product from './Product/ProductSchema.js';
 import ProductReview from './Product/ProductReview.js';
-import EventSchema from './Event/EventSchema.js';
-import EventRatingSchema from './Event/EventRatingSchema.js';
+import EventDetails from './Event/EventSchema.js';
+import EventRating from './Event/EventRatingSchema.js';
+import EventRequest from './Event/EventRequestSchema.js';
 
 export{
     User,
@@ -20,6 +21,7 @@ export{
     BlogReview,
     Product,
     ProductReview,
-    EventSchema,
-    EventRatingSchema
+    EventDetails,
+    EventRating,
+    EventRequest
 };

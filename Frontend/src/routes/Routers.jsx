@@ -11,6 +11,8 @@ import Blog from "../components/layout/EcoPractice/blogPage";
 import BlogDetails from '../components/layout/EcoPractice/sections/BlogDetails/BlogDetails';
 import TextEditor from '../components/layout/EcoPractice/sections/Post/TextEditor';
 import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/PreviewAndPublish';
+import Event from '../components/pages/Event';
+import AdminPage from '../components/pages/AdminPage';
 
 
 
@@ -32,6 +34,9 @@ const Routers = () => {
       <Route path="/blog/:id" element={<BlogDetails />} />
       <Route path="/post-article" element={<TextEditor />} />
       <Route path="/post-article/:postId/preview" element={<PreviewAndPublish />} />
+
+      <Route path="/event" element={<Event />} />
+      <Route path="/admin" element={<AdminPage />} />
 
     </Routes>
   );

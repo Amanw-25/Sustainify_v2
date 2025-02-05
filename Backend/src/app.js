@@ -7,6 +7,7 @@ import carbonFootPrintRouter from "./routes/carbonFootPrintRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import twilioRouter from "./routes/twilioRoute.js";
 import BlogRouter from "./routes/BlogRoute.js";
+import EventRoute from "./routes/EventRoute.js";
 
 export const app = express();
 
@@ -28,4 +29,5 @@ app.use("/api/v1/sustainify/carbon", carbonFootPrintRouter);
 app.use("/api/v1/sustainify/product", productRouter);
 app.use("/api/v1/sustainify/twilio", twilioRouter);
 app.use("/api/v1/sustainify/blog", BlogRouter);
+app.use("/api/v1/sustainify/event", EventRoute);
 
