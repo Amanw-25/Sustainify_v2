@@ -4,6 +4,7 @@ import { BASE_URL } from "../../../config.js";
 import { HashLoader } from "react-spinners";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from '@mui/material/Paper';
+import Sidebar from "./Global/Sidebar.jsx";
 
 const AdminApproval = () => {
   const [requests, setRequests] = useState([]);
@@ -141,6 +142,8 @@ const AdminApproval = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+          <Sidebar/>
+
       <Typography variant="h5">Event Approval Requests</Typography>
       <Paper sx={{ height: 400, width: '100%', mt: 3 }}>
         <DataGrid
