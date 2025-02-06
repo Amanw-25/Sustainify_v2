@@ -14,7 +14,6 @@ import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/Pr
 import Event from '../components/pages/Event';
 import AdminPage from '../components/pages/AdminPage';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
-import RequestEvent from '../components/layout/Events/section/Event/RequestEvent';
 import AdminApproval from '../components/layout/AdminDashboard/AdminApproval';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -40,7 +39,6 @@ const Routers = () => {
 
       <Route path="/event" element={<Event />} />
       <Route path="/event-details/:id" element={<EventsDetails />} />
-      <Route path="/request-event/:eventId" element={<RequestEvent />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route 
         path="/admin-approval" 

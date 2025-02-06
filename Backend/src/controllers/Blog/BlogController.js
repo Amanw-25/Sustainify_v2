@@ -211,10 +211,6 @@ export const updateBlogPost = async (req, res) => {
     blogPost.previewImage = previewImage;
     blogPost.updatedAt = Date.now();
 
-    // if (!req.files || req.files.length === 0) {
-    //   blogPost.previewImage = blogPost.previewImage || 'https://sb.ecobnb.net/app/uploads/sites/3/2023/05/Green-Blogging-How-to-Start-a-Sustainable-Living-Blog-1-1170x490.jpg';
-    // }
-
     await blogPost.save();
 
     res.json({
