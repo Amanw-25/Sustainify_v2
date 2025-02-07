@@ -1,6 +1,18 @@
-import { useState } from "react";
-import { Box, IconButton, Typography, useTheme, Drawer, List, ListItem, ListItemText, Divider } from "@mui/material";
+import React, { useState } from "react";
+import { 
+  Box, 
+  IconButton, 
+  Typography, 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemIcon, 
+  ListItemText, 
+  Divider 
+} from "@mui/material";
 import { Link } from "react-router-dom";
+
+// Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
@@ -14,198 +26,181 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
-const SidebarItem = ({ title, to, icon, selected, setSelected, collapsed }) => {
-  return (
-    <ListItem button onClick={() => setSelected(title)} component={Link} to={to} selected={selected === title}>
-      {icon}
-      {!collapsed && <ListItemText primary={title} />}
-    </ListItem>
-  );
+// Generate random avatar
+const generateRandomAvatar = () => {
+  const randomId = Math.floor(Math.random() * 1000);
+  return `https://i.pravatar.cc/150?u=${randomId}`;
 };
 
+const menuItems = [
+  {
+    title: "Dashboard",
+    icon: <HomeOutlinedIcon />,
+    to: "/dashboard"
+  },
+  {
+    category: "Events",
+    items: [
+      { title: "Manage Request", icon: <PeopleOutlinedIcon />, to: "/event-approval" },
+      { title: "Manage Event", icon: <ContactsOutlinedIcon />, to: "/event-manage" },
+      { title: "Event Data", icon: <ReceiptOutlinedIcon />, to: "/event-data" },
+      { title: "Event Calendar", icon: <MapOutlinedIcon />, to: "/event-calendar" }
+    ]
+  },
+  {
+    category: "Pages",
+    items: [
+      { title: "Profile Form", icon: <PersonOutlinedIcon />, to: "/form" },
+      { title: "Calendar", icon: <CalendarTodayOutlinedIcon />, to: "/calendar" },
+    ]
+  },
+  {
+    category: "Charts",
+    items: [
+      { title: "Product Bar Chart", icon: <BarChartOutlinedIcon />, to: "/bar" },
+      { title: "Evnet Pie Chart", icon: <PieChartOutlineOutlinedIcon />, to: "/pie" },
+      { title: "Subscription Line Chart", icon: <TimelineOutlinedIcon />, to: "/line" },
+    ]
+  }
+];
+
 const Sidebar = () => {
-  const theme = useTheme();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true); // Drawer state
-  const [selected, setSelected] = useState("Dashboard");
-  const [collapsed, setCollapsed] = useState(false); // Collapsed state
+  const [collapsed, setCollapsed] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("Dashboard");
+  const avatarUrl = generateRandomAvatar();
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Drawer */}
-      <Drawer
-        sx={{
-          width: collapsed ? 60 : 240, // Change width based on collapse state
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: collapsed ? 60 : 240,
-            backgroundColor: "#ffffff", // White background for the sidebar
-            color: "#333", // Dark text color
-            borderRight: 0,
-            boxShadow: collapsed ? "none" : "2px 0px 5px rgba(0,0,0,0.1)", // Add shadow when not collapsed
-          },
-        }}
-        variant="permanent"
-        anchor="left"
-        open={isDrawerOpen}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "100%",
-          }}
-        >
-          {/* Logo and Toggle Button */}
-          <Box sx={{ padding: "20px", display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="h3" color={collapsed ? "#333" : "#000"} fontWeight="bold">
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: collapsed ? 70 : 240,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: collapsed ? 70 : 240,
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
+          transition: 'width 0.3s ease',
+        }
+      }}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100%', 
+        overflow: 'hidden' 
+      }}>
+        {/* Header */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          p: 2 
+        }}>
+          {!collapsed && (
+            <Typography variant="h5" fontWeight="bold">
               ADMIN
             </Typography>
-            <IconButton onClick={() => setCollapsed(!collapsed)}>
-              <MenuOutlinedIcon />
-            </IconButton>
-          </Box>
-
-          {/* Profile Image and Name */}
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "20px" }}>
-            <img
-              alt="profile-user"
-              width="60px"
-              height="60px"
-              src={`../public/user.jpg`}
-              style={{ cursor: "pointer", borderRadius: "50%" }}
-            />
-            {!collapsed && (
-              <>
-                <Typography variant="h5" color="#333" fontWeight="bold" sx={{ marginTop: "10px" }}>
-                  Aman
-                </Typography>
-                <Typography variant="h6" color="#388e3c">
-                  Admin
-                </Typography>
-              </>
-            )}
-          </Box>
-
-          <Divider />
-
-          {/* Menu Items */}
-          <List>
-            <SidebarItem
-              title="Dashboard"
-              to="/"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <Typography variant="h6" color="#333" sx={{ m: "15px 0 5px 20px" }}>
-              Data
-            </Typography>
-            <SidebarItem
-              title="Manage Team"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Contacts Information"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Invoices Balances"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-
-            <Typography variant="h6" color="#333" sx={{ m: "15px 0 5px 20px" }}>
-              Pages
-            </Typography>
-            <SidebarItem
-              title="Profile Form"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-
-            <Typography variant="h6" color="#333" sx={{ m: "15px 0 5px 20px" }}>
-              Charts
-            </Typography>
-            <SidebarItem
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-            <SidebarItem
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={collapsed}
-            />
-          </List>
+          )}
+          <IconButton 
+            onClick={() => setCollapsed(!collapsed)}
+            sx={{ ml: collapsed ? 0 : 'auto' }}
+          >
+            <MenuOutlinedIcon />
+          </IconButton>
         </Box>
-      </Drawer>
 
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          padding: "20px",
-        }}
-      >
-        {/* Content goes here */}
-        <Typography variant="h4">Welcome to the Admin Dashboard</Typography>
+        {/* Profile */}
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          p: 2 
+        }}>
+          <img 
+            src={avatarUrl} 
+            alt="User Avatar" 
+            style={{ 
+              width: 60, 
+              height: 60, 
+              borderRadius: '50%', 
+              objectFit: 'cover' 
+            }} 
+          />
+          {!collapsed && (
+            <>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1 }}>
+                Aman
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Admin
+              </Typography>
+            </>
+          )}
+        </Box>
+
+        <Divider />
+
+        {/* Scrollable Menu */}
+        <Box sx={{ 
+          overflowY: 'auto', 
+          overflowX: 'hidden',
+          flex: 1 
+        }}>
+          {menuItems.map((section, index) => (
+            <React.Fragment key={index}>
+              {section.category && !collapsed && (
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    px: 2, 
+                    py: 1, 
+                    color: 'text.secondary' 
+                  }}
+                >
+                  {section.category}
+                </Typography>
+              )}
+              <List>
+                {section.items ? (
+                  section.items.map((item) => (
+                    <ListItem
+                      key={item.title}
+                      component={Link}
+                      to={item.to}
+                      selected={selectedItem === item.title}
+                      onClick={() => setSelectedItem(item.title)}
+                      sx={{
+                        '& .MuiListItemIcon-root': {
+                          minWidth: collapsed ? 'auto' : 56
+                        }
+                      }}
+                    >
+                      <ListItemIcon>{item.icon}</ListItemIcon>
+                      {!collapsed && <ListItemText primary={item.title} />}
+                    </ListItem>
+                  ))
+                ) : (
+                  <ListItem
+                    component={Link}
+                    to={section.to}
+                    selected={selectedItem === section.title}
+                    onClick={() => setSelectedItem(section.title)}
+                    sx={{
+                      '& .MuiListItemIcon-root': {
+                        minWidth: collapsed ? 'auto' : 56
+                      }
+                    }}
+                  >
+                    <ListItemIcon>{section.icon}</ListItemIcon>
+                    {!collapsed && <ListItemText primary={section.title} />}
+                  </ListItem>
+                )}
+              </List>
+            </React.Fragment>
+          ))}
+        </Box>
       </Box>
-    </Box>
+    </Drawer>
   );
 };
 

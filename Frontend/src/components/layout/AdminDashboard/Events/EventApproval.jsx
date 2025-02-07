@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { BASE_URL } from "../../../config.js";
+import { Box, Typography, Button, Paper } from "@mui/material";
+import { BASE_URL } from "../../../../config.js";
 import { HashLoader } from "react-spinners";
 import { DataGrid } from "@mui/x-data-grid";
-import Paper from '@mui/material/Paper';
-import Sidebar from "./Global/Sidebar.jsx";
+import Sidebar from "../Global/Sidebar.jsx";
 
-const AdminApproval = () => {
+const EventApproval = () => {
   const [requests, setRequests] = useState([]);
   const [loadingRequestId, setLoadingRequestId] = useState(null);
   const [loadingAction, setLoadingAction] = useState(null);
@@ -90,25 +89,33 @@ const AdminApproval = () => {
   };
 
   const columns = [
-    { field: "eventName", headerName: "Event Name", width: 180 },
-    { field: "requestedBy", headerName: "Requested By", width: 180 },
-    {field:"email",headerName:"Email",width:180},
+    { field: "eventName", headerName: "Event Name", width: 200 },
+    { field: "requestedBy", headerName: "Requested By", width: 200 },
+    { field: "email", headerName: "Email", width: 220 },
     { field: "status", headerName: "Status", width: 130 },
-    { field: "requestId", headerName: "RequestId", width: 180 },
+    { field: "requestId", headerName: "Request ID", width: 220 },
     {
       field: "actions",
       headerName: "Actions",
       width: 250,
       renderCell: (params) => (
-        <>
+        <Box
+          display="flex"
+          justifyContent="center"
+          margin= "10px"
+          alignItems="center"
+          width="100%"
+          gap={2}
+        >
           <Button
             variant="contained"
             color="success"
+            sx={{ padding: "5px 10px", minWidth: "90px" }} 
             onClick={() => handleApproval(params.row.id, true)}
             disabled={loadingRequestId === params.row.id}
           >
             {loadingRequestId === params.row.id && loadingAction === "approve" ? (
-              <HashLoader color="black" size={20} />
+              <HashLoader color="white" size={20} />
             ) : (
               "Approve"
             )}
@@ -116,20 +123,21 @@ const AdminApproval = () => {
           <Button
             variant="contained"
             color="error"
-            sx={{ ml: 2 }}
+            sx={{ padding: "5px 10px", minWidth: "90px" }}
             onClick={() => RejectApproval(params.row.id, false)}
             disabled={loadingRequestId === params.row.id}
           >
             {loadingRequestId === params.row.id && loadingAction === "reject" ? (
-              <HashLoader color="black" size={20} />
+              <HashLoader color="white" size={20} />
             ) : (
               "Reject"
             )}
           </Button>
-        </>
+        </Box>
       ),
     },
   ];
+  
 
   const rows = requests.map((request) => ({
     id: request._id,
@@ -141,21 +149,37 @@ const AdminApproval = () => {
   }));
 
   return (
-    <Box sx={{ p: 3 }}>
-          <Sidebar/>
+    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#f4f6f9" }}>
+      <Sidebar />
 
-      <Typography variant="h5">Event Approval Requests</Typography>
-      <Paper sx={{ height: 400, width: '100%', mt: 3 }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          checkboxSelection
-          sx={{ border: 0 }}
-        />
-      </Paper>
+      <Box sx={{ flexGrow: 1, padding: "20px", overflow: "auto" }}>
+        <Box
+          sx={{
+            backgroundColor: "#fff",
+            padding: "15px 20px",
+            borderRadius: "8px",
+            boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.1)",
+            marginBottom: "20px",
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold">
+            Event Approval Requests
+          </Typography>
+        </Box>
+
+        <Paper sx={{ height: '80%', width: "100%", padding: "20px" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={5}
+            padding="10px"
+            checkboxSelection
+            sx={{ border: 0 }}
+          />
+        </Paper>
+      </Box>
     </Box>
   );
 };
 
-export default AdminApproval;
+export default EventApproval;

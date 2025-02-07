@@ -1,5 +1,6 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import Home from '../components/pages/Home';
 import Login from '../components/pages/Login';
 import Signup from '../components/pages/Signup';
@@ -12,23 +13,25 @@ import BlogDetails from '../components/layout/EcoPractice/sections/BlogDetails/B
 import TextEditor from '../components/layout/EcoPractice/sections/Post/TextEditor';
 import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/PreviewAndPublish';
 import Event from '../components/pages/Event';
-import AdminPage from '../components/pages/AdminPage';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
-import AdminApproval from '../components/layout/AdminDashboard/AdminApproval';
-import ProtectedRoute from './ProtectedRoute';
 
+import Dashboard from '../components/layout/AdminDashboard/Dashboard';
+import AdminApproval from '../components/layout/AdminDashboard/Events/EventApproval';
+import ManageEvent from '../components/layout/AdminDashboard/Events/ManageEvent';
+import EventData from '../components/layout/AdminDashboard/Events/EventData';
+import EventCalendar from '../components/layout/AdminDashboard/Events/EventCalendar';
 
 const Routers = () => {
+  const { role } = useContext(AuthContext); // Get user role
+
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
-
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Signup />} />
-
       <Route path="/contact" element={<Contact />} />
-
       <Route path="/eco-store" element={<EcoStore />} />
       <Route path="/carbon-footprint-tracker" element={<CarbonFootprint />} /> 
       <Route path="/eco-store/:id" element={<ProductDetails />} />
@@ -36,19 +39,18 @@ const Routers = () => {
       <Route path="/blog/:id" element={<BlogDetails />} />
       <Route path="/post-article" element={<TextEditor />} />
       <Route path="/post-article/:postId/preview" element={<PreviewAndPublish />} />
-
       <Route path="/event" element={<Event />} />
       <Route path="/event-details/:id" element={<EventsDetails />} />
-      <Route path="/admin" element={<AdminPage />} />
-      <Route 
-        path="/admin-approval" 
-        element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminApproval />
-          </ProtectedRoute>
-        } />
 
+      {/* Admin Only Routes */}
+      <Route path="/dashboard" element={role === "admin" ? <Dashboard /> : <Navigate to="/" />} />
+      <Route path="/event-approval" element={role === "admin" ? <AdminApproval /> : <Navigate to="/" />} />
+      <Route path="/event-manage" element={role === "admin" ? <ManageEvent /> : <Navigate to="/" />} />
+      <Route path="/event-data" element={role === "admin" ? <EventData /> : <Navigate to="/" />} />
+      <Route path="/event-calendar" element={role === "admin" ? <EventCalendar /> : <Navigate to="/" />} />
 
+      {/* Redirect unknown routes */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

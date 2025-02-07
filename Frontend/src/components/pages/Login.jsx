@@ -23,39 +23,45 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    try{
-      const res=await fetch(`${BASE_URL}/auth/login`,{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
+  
+    try {
+      const res = await fetch(`${BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
-        body:JSON.stringify(formData)
+        body: JSON.stringify(formData)
       });
-
-      const data=await res.json();
-      if(!res.ok){
+  
+      const data = await res.json();
+      if (!res.ok) {
         throw new Error(data.message);
       }
-
+  
       dispatch({
-        type:"LOGIN_SUCCESS",
-        payload:{
-          token:data.token,
-          role:data.user.role
+        type: "LOGIN_SUCCESS",
+        payload: {
+          token: data.token,
+          role: data.user.role
         }
-      })
-
+      });
+  
       setLoading(false);
-      toast.success("Login Successfull");
-      navigate("/");
-    }
-    catch(error){
-      console.log("Error",error);
+      toast.success("Login Successful");
+  
+      if (data.user.role === "admin") {
+        navigate("/dashboard"); 
+      } else {
+        navigate("/");
+      }
+  
+    } catch (error) {
+      console.log("Error", error);
       setLoading(false);
       toast.error(error.message);
     }
   };
+  
 
   return (
     <div className="w-full h-screen flex">

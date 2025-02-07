@@ -1,70 +1,106 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import React from "react";
+import { Box, Typography, IconButton } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import Sidebar from "../../layout/AdminDashboard/Global/Sidebar.jsx";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../../context/AuthContext";
 
-const AdminDashboard = () => {
-  const [requests, setRequests] = useState([]);
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
 
-  useEffect(() => {
-    const storedRequests = JSON.parse(localStorage.getItem("eventRequests")) || [];
-    setRequests(storedRequests);
-  }, []);
-
-  const handleApprove = (id) => {
-    let updatedRequests = requests.map((req) =>
-      req.id === id ? { ...req, status: "Approved" } : req
-    );
-    setRequests(updatedRequests);
-    localStorage.setItem("eventRequests", JSON.stringify(updatedRequests));
-
-    // Simulate sending an email (later replaced with backend email integration)
-    alert(`✅ ${updatedRequests.find((req) => req.id === id).name} has been approved and notified!`);
-  };
-
-  const handleReject = (id) => {
-    let updatedRequests = requests.map((req) =>
-      req.id === id ? { ...req, status: "Rejected" } : req
-    );
-    setRequests(updatedRequests);
-    localStorage.setItem("eventRequests", JSON.stringify(updatedRequests));
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+    navigate("/login");
   };
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "auto", padding: "24px" }}>
-      <Typography variant="h4" fontWeight="bold" textAlign="center" gutterBottom>
-        🔑 Admin Dashboard
-      </Typography>
+    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#f4f6f9" }}>
+      <Sidebar />
+      <Box sx={{ flexGrow: 1, padding: "20px", overflow: "auto" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            padding: "15px 20px",
+            borderRadius: "8px",
+            boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.1)",
+            marginBottom: "20px",
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold">
+            Welcome to Admin Dashboard
+          </Typography>
+          <IconButton onClick={handleLogout} color="error">
+            <LogoutIcon />
+          </IconButton>
+        </Box>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Event</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {requests.map((req) => (
-            <TableRow key={req.id}>
-              <TableCell>{req.name}</TableCell>
-              <TableCell>{req.email}</TableCell>
-              <TableCell>{req.eventTitle}</TableCell>
-              <TableCell>{req.status}</TableCell>
-              <TableCell>
-                {req.status === "Pending" && (
-                  <>
-                    <Button onClick={() => handleApprove(req.id)} color="success">Approve</Button>
-                    <Button onClick={() => handleReject(req.id)} color="error">Reject</Button>
-                  </>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "20px",
+          }}
+        >
+          <Box className="bg-white p-6 rounded-lg shadow-md">
+            <Typography variant="h6" fontWeight="bold" color="primary">
+              Total Users
+            </Typography>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              className="text-gray-800"
+            >
+              1,250
+            </Typography>
+          </Box>
+
+          <Box className="bg-white p-6 rounded-lg shadow-md">
+            <Typography variant="h6" fontWeight="bold" color="secondary">
+              Sales Revenue
+            </Typography>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              className="text-gray-800"
+            >
+              $32,000
+            </Typography>
+          </Box>
+
+          <Box className="bg-white p-6 rounded-lg shadow-md">
+            <Typography variant="h6" fontWeight="bold" color="success">
+              Pending Orders
+            </Typography>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              className="text-gray-800"
+            >
+              87
+            </Typography>
+          </Box>
+
+          <Box className="bg-white p-6 rounded-lg shadow-md">
+            <Typography variant="h6" fontWeight="bold" color="error">
+              Complaints
+            </Typography>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              className="text-gray-800"
+            >
+              12
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };
 
-export default AdminDashboard;
+export default Dashboard;
