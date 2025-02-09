@@ -4,6 +4,9 @@ import { useParams } from "react-router-dom";
 import { BASE_URL } from "../../../../../config.js";
 import Loading from '../../../../../Loader/Loading.jsx';
 import Error from '../../../../../Error/Error.jsx';
+import Cart from '../Cart/Cart.jsx';
+
+const CART_STORAGE_KEY = 'eco-store-cart';
 
 const ProductDetails = () => {
   const [tab, setTab] = useState("details");
@@ -14,10 +17,98 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const imageContainerRef = useRef(null);
   const zoomRef = useRef(null);
 
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) {
+        const { items, timestamp } = JSON.parse(savedCart);
+        if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
+          return [];
+        }
+        return items;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error);
+      return [];
+    }
+  });
+
   const { id } = useParams();
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
+        items: cart,
+        timestamp: Date.now()
+      }));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  }, [cart]);
+
+  const addToCart = (product) => {
+    setCart(currentCart => {
+      const existingItem = currentCart.find(item => item._id === product._id);
+      if (existingItem) {
+        return currentCart.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...currentCart, { 
+        ...product, 
+        quantity: 1,
+        image: product.images?.[0]?.url 
+      }];
+    });
+    setIsCartOpen(true);
+  };
+
+  const updateQuantity = (productId, delta) => {
+    setCart(currentCart => 
+      currentCart.map(item => {
+        if (item._id === productId) {
+          const newQuantity = item.quantity + delta;
+          return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+        }
+        return item;
+      }).filter(Boolean)
+    );
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(currentCart => currentCart.filter(item => item._id !== productId));
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items: cart }),
+      });
+      
+      const { sessionId } = await response.json();
+      
+      const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+      
+      if (!error) {
+        setCart([]);
+        localStorage.removeItem(CART_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error('Error in checkout:', error);
+    }
+  };
 
   const handleThumbnailClick = (imageUrl) => {
     setImageLoading(true);
@@ -201,11 +292,17 @@ const ProductDetails = () => {
                   &#8377;{product.price}
                 </h2>
               </div>
-              <button className="mt-6 w-full bg-[#479CC9] text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-300">
+              <button 
+                onClick={() => addToCart(product)}
+                className="mt-6 w-full bg-[#004d40] hover:bg-[#00695c] text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
+              >
                 <FaShoppingCart size={20} />
                 Add to Cart
               </button>
-              <button className="mt-6 w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors duration-300">
+              <button 
+                onClick={handleCheckout}
+                className="mt-6 w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors duration-300"
+              >
                 Buy Now
               </button>
               <button className="mt-3 w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2 transition-colors duration-300">
@@ -265,7 +362,6 @@ const ProductDetails = () => {
               </ul>
             </div>
           )}
-
           <div className="mt-[50px]">
             {tab === "reviews" && (
               <div>
@@ -305,6 +401,14 @@ const ProductDetails = () => {
               </div>
             )}
           </div>
+          <Cart 
+        isOpen={isCartOpen}
+        onClose={setIsCartOpen}
+        cart={cart}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeFromCart}
+        onCheckout={handleCheckout}
+      />
         </div>
       </div>
     </section>

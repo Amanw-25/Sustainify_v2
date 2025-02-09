@@ -30,6 +30,7 @@
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "stripe": "^17.6.0",
     "twilio": "^5.4.3"
   }
 }

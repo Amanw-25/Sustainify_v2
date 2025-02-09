@@ -12,6 +12,7 @@ import BlogRouter from "./routes/BlogRoute.js";
 import EventRoute from "./routes/EventRoute.js";
 import MeetingRoute from "./routes/MeetingRoute.js";
 import socketHandler from "./socket.js";
+import CheckoutRouter from "./routes/checkoutRoute.js";
 
 export const app = express();
 export const server = http.createServer(app);
@@ -34,6 +35,7 @@ app.use(
   })
 );
 
+
 // Routes
 app.use("/api/v1/sustainify/auth", Authrouter);
 app.use("/api/v1/sustainify/carbon", carbonFootPrintRouter);
@@ -42,6 +44,8 @@ app.use("/api/v1/sustainify/twilio", twilioRouter);
 app.use("/api/v1/sustainify/blog", BlogRouter);
 app.use("/api/v1/sustainify/event", EventRoute);
 app.use("/api/v1/sustainify/meeting", MeetingRoute);
+app.use("/api/v1/sustainify/checkout", CheckoutRouter);
+
 
 // Socket.io Connection
 io.on('connection', (socket) => socketHandler(socket, io));

@@ -1,3 +1,5 @@
+
+// ProductCard.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,16 +13,22 @@ import {
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
 
-  const handleFavoriteToggle = () => {
+  const handleFavoriteToggle = (e) => {
+    e.stopPropagation();
     setIsFavorite(!isFavorite);
   };
 
   const handleCardClick = () => {
     navigate(`/eco-store/${product._id}`);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    onAddToCart(product);
   };
 
   return (
@@ -38,17 +46,17 @@ const ProductCard = ({ product }) => {
       }}
       onClick={handleCardClick}
     >
-    <CardMedia
-      component="img"
-      height="100"
-      image={product.images?.[0]?.url || "fallback-image-url"}
-      alt={product.name}
-      sx={{
-        objectFit: "cover",
-        borderTopLeftRadius: "10px",
-        borderTopRightRadius: "8px",
-      }}
-    />
+      <CardMedia
+        component="img"
+        height="100"
+        image={product.images?.[0]?.url || "fallback-image-url"}
+        alt={product.name}
+        sx={{
+          objectFit: "cover",
+          borderTopLeftRadius: "8px",
+          borderTopRightRadius: "8px",
+        }}
+      />
 
       <CardContent sx={{ padding: "16px" }}>
         <Typography
@@ -59,6 +67,7 @@ const ProductCard = ({ product }) => {
         >
           {product.name}
         </Typography>
+        
         <Typography
           variant="body2"
           color="text.secondary"
@@ -66,6 +75,7 @@ const ProductCard = ({ product }) => {
         >
           {product.shortdescription}
         </Typography>
+        
         <Typography variant="h6" sx={{ fontWeight: "bold", color: "#00796b" }}>
           ${product.price}
         </Typography>
@@ -80,7 +90,7 @@ const ProductCard = ({ product }) => {
         >
           <Button
             variant="contained"
-            color="primary"
+            onClick={handleAddToCart}
             sx={{
               backgroundColor: "#004d40",
               "&:hover": {
@@ -92,11 +102,10 @@ const ProductCard = ({ product }) => {
           </Button>
 
           <IconButton
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFavoriteToggle();
+            onClick={handleFavoriteToggle}
+            sx={{ 
+              color: isFavorite ? "red" : "gray"
             }}
-            sx={{ color: isFavorite ? "red" : "gray" }}
           >
             <FavoriteIcon />
           </IconButton>
