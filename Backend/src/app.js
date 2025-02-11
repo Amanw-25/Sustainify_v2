@@ -13,6 +13,7 @@ import EventRoute from "./routes/EventRoute.js";
 import MeetingRoute from "./routes/MeetingRoute.js";
 import socketHandler from "./socket.js";
 import CheckoutRouter from "./routes/checkoutRoute.js";
+import CartRouter from "./routes/CartRoute.js";
 
 export const app = express();
 export const server = http.createServer(app);
@@ -45,6 +46,7 @@ app.use("/api/v1/sustainify/blog", BlogRouter);
 app.use("/api/v1/sustainify/event", EventRoute);
 app.use("/api/v1/sustainify/meeting", MeetingRoute);
 app.use("/api/v1/sustainify/checkout", CheckoutRouter);
+app.use("/api/v1/sustainify/cart", CartRouter);
 
 
 // Socket.io Connection

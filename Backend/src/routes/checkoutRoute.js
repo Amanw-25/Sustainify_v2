@@ -1,15 +1,19 @@
-import express from "express";
+import express from 'express';
 import { authenticate, restrict } from "../middlewares/verifyToken.js";
-import { getCheckoutSession, handleStripeWebhook } from "../controllers/Product/CheckoutController.js";
+import { 
+  getCheckoutSession, 
+  verifyPayment,
+  getUserOrders 
+} from '../controllers/Product/CheckoutController.js';
 
 const CheckoutRouter = express.Router();
-CheckoutRouter.post("/create-session", authenticate, restrict("user"), getCheckoutSession);
 
-CheckoutRouter.post(
-  "/webhook",
-  express.raw({ type: "application/json" }), 
-  handleStripeWebhook
-);
+// User must be logged in to access these routes
+CheckoutRouter.use(authenticate);
+CheckoutRouter.use(restrict('user'));
 
+CheckoutRouter.post('/create-checkout-session', getCheckoutSession);
+CheckoutRouter.get('/verify-payment', verifyPayment);
+CheckoutRouter.get('/orders', getUserOrders);
 
 export default CheckoutRouter;

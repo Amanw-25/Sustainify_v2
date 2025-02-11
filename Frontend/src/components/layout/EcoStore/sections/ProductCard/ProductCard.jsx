@@ -1,5 +1,3 @@
-
-// ProductCard.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,10 +10,13 @@ import {
   Box,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { toast } from "react-toastify";
+import { useCart } from '../../../../../hooks/useCart'
 
-const ProductCard = ({ product, onAddToCart }) => {
+const ProductCard = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
+  const { addToCart } = useCart(); 
 
   const handleFavoriteToggle = (e) => {
     e.stopPropagation();
@@ -26,9 +27,15 @@ const ProductCard = ({ product, onAddToCart }) => {
     navigate(`/eco-store/${product._id}`);
   };
 
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    onAddToCart(product);
+  const handleAddToCart = async (e) => {
+    e.stopPropagation(); 
+    const success = await addToCart(product);
+
+    if (success) {
+      toast.success("Product added to cart");
+    } else {
+      toast.error("Failed to add product to cart");
+    }
   };
 
   return (
@@ -67,7 +74,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         >
           {product.name}
         </Typography>
-        
+
         <Typography
           variant="body2"
           color="text.secondary"
@@ -75,9 +82,9 @@ const ProductCard = ({ product, onAddToCart }) => {
         >
           {product.shortdescription}
         </Typography>
-        
+
         <Typography variant="h6" sx={{ fontWeight: "bold", color: "#00796b" }}>
-          ${product.price}
+          &#8377;{product.price}
         </Typography>
 
         <Box
@@ -103,8 +110,8 @@ const ProductCard = ({ product, onAddToCart }) => {
 
           <IconButton
             onClick={handleFavoriteToggle}
-            sx={{ 
-              color: isFavorite ? "red" : "gray"
+            sx={{
+              color: isFavorite ? "red" : "gray",
             }}
           >
             <FavoriteIcon />

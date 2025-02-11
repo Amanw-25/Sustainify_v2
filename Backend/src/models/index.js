@@ -12,6 +12,7 @@ import EventRating from './Event/EventRatingSchema.js';
 import EventRequest from './Event/EventRequestSchema.js';
 import Meeting from './Meeting/Meeting.js';
 import Booking from './Booking/BookingSchema.js';
+import Cart from './Product/CartSchema.js';
 
 export{
     User,
@@ -27,6 +28,7 @@ export{
     EventRating,
     EventRequest,
     Meeting,
-    Booking
+    Booking,
+    Cart
 
 };
