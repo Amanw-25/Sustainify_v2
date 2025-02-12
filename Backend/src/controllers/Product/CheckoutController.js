@@ -1,4 +1,4 @@
-import { User, Product, Booking } from "../../models/index.js";
+import { User, Product, Booking ,Cart} from "../../models/index.js";
 import Stripe from "stripe";
 
 export const getCheckoutSession = async (req, res) => {
@@ -120,6 +120,7 @@ export const getCheckoutSession = async (req, res) => {
 };
 
 export const verifyPayment = async (req, res) => {
+  const id=req.userId;
   try {
     const { session_id } = req.query;
 
@@ -197,6 +198,8 @@ export const verifyPayment = async (req, res) => {
     });
 
     await booking.save();
+
+    await Cart.findOneAndDelete({ user: id });
 
     // Update product stock levels
     for (const item of orderItems) {

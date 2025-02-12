@@ -1,6 +1,12 @@
-import {ProductDescription} from "./ProductDescription";
+import { ProductDescription } from "./ProductDescription";
 import { ReviewsList } from './ReviewList';
-export const ProductTabs = ({ tab, setTab, product, reviews }) => {
+import  ReviewForm  from './ProductReviewForm';  // Add this import
+
+export const ProductTabs = ({ tab, setTab, product, reviews, setReviews }) => {
+  const handleReviewAdded = (newReview) => {
+    setReviews(prevReviews => [newReview, ...prevReviews]);
+  };
+
   return (
     <>
       <div className="mt-[50px] border-b border-solid border-[#0066ff34]">
@@ -26,7 +32,13 @@ export const ProductTabs = ({ tab, setTab, product, reviews }) => {
         {tab === "details" ? (
           <ProductDescription product={product} />
         ) : (
-          <ReviewsList reviews={reviews} />
+          <div className="space-y-8">
+            <ReviewForm 
+              productId={product._id} 
+              onReviewAdded={handleReviewAdded}
+            />
+            <ReviewsList reviews={reviews} />
+          </div>
         )}
       </div>
     </>

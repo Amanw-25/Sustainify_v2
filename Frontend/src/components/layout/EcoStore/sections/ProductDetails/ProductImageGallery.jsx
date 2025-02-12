@@ -1,10 +1,39 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 
-export const ProductImages = ({ images, mainImage, setMainImage, handleImageZoom, zoomPosition,handleMouseEnter, handleMouseLeave }) => {
+export const ProductImages = ({
+  images,
+  mainImage,
+  setMainImage,
+}) => {
   const [imageLoading, setImageLoading] = useState(true);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [isZoomActive, setIsZoomActive] = useState(false);
+  
   const imageContainerRef = useRef(null);
   const zoomRef = useRef(null);
-  
+
+  // Function to handle zoom effect on mouse move
+  const handleImageZoom = (e) => {
+    if (!imageContainerRef.current) return;
+
+    const { left, top, width, height } =
+      imageContainerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+
+    setZoomPosition({ x, y });
+  };
+
+  // Show zoom effect on mouse enter
+  const handleMouseEnter = () => {
+    setIsZoomActive(true);
+  };
+
+  // Hide zoom effect on mouse leave
+  const handleMouseLeave = () => {
+    setIsZoomActive(false);
+  };
+
   return (
     <div className="md:col-span-2 flex gap-5">
       <div className="flex flex-col gap-3">
@@ -41,7 +70,9 @@ export const ProductImages = ({ images, mainImage, setMainImage, handleImageZoom
 
           <div
             ref={zoomRef}
-            className="absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none transition-opacity duration-200"
+            className={`absolute top-0 left-0 w-full h-full transition-opacity duration-200 pointer-events-none ${
+              isZoomActive ? "opacity-100" : "opacity-0"
+            }`}
             style={{
               backgroundImage: `url(${mainImage || (images[0] && images[0].url)})`,
               backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
