@@ -9,12 +9,14 @@ import CarbonFootprint from '../components/pages/CarbonFootprint';
 
 import EcoStore from '../components/pages/Eco-Store';
 import ProductDetails from '../components/layout/EcoStore/sections/ProductDetails/ProductDetails';
-import Blog from "../components/layout/EcoPractice/blogPage";
-import BlogDetails from '../components/layout/EcoPractice/sections/BlogDetails/BlogDetails';
 import CheckoutSuccess from '../components/layout/EcoStore/sections/Checkout/CheckOutSession';
 
+import Blog from "../components/layout/EcoPractice/blogPage";
+import BlogDetails from '../components/layout/EcoPractice/sections/BlogDetails/BlogDetails';
 import TextEditor from '../components/layout/EcoPractice/sections/Post/TextEditor';
 import PreviewAndPublish from '../components/layout/EcoPractice/sections/Post/PreviewAndPublish';
+import SubscriptionSuccess from '../components/layout/EcoPractice/sections/BlogDetails/SubscriptionSuccess';
+
 import Event from '../components/pages/Event';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
 
@@ -46,6 +48,9 @@ const Routers = () => {
       <Route path="/blog/:id" element={<BlogDetails />} />
       <Route path="/post-article" element={<TextEditor />} />
       <Route path="/post-article/:postId/preview" element={<PreviewAndPublish />} />
+      <Route path="/subscription-success" element={<SubscriptionSuccess />} />
+
+
       <Route path="/event" element={<Event />} />
       <Route path="/event-details/:id" element={<EventsDetails />} />
 

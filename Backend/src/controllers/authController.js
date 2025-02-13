@@ -1,9 +1,17 @@
 import bcrypt from "bcrypt";
-import{ User }from "../models/index.js";
+import { User } from "../models/index.js";
 import jwt from "jsonwebtoken";
 
-const genrateToken = (user) => {
-  return jwt.sign({ id: user._id ,role: user.role }, process.env.JWT_SECRET, { expiresIn: "30d" });
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+      isMember: user.isMember, // ✅ Ensure this is included
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "30d" }
+  );
 };
 
 export const register = async (req, res) => {
@@ -42,8 +50,6 @@ export const register = async (req, res) => {
   }
 };
 
-
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -52,7 +58,7 @@ export const login = async (req, res) => {
         message: "All fields are required",
       });
     }
-    
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
@@ -67,7 +73,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = genrateToken(user);
+    const token = generateToken(user);
     res.status(200).json({
       message: "User logged in successfully",
       token,
@@ -76,14 +82,14 @@ export const login = async (req, res) => {
         email: user.email,
         role: user.role,
         profilePhoto: user.profilePhoto,
+        isMember: user.isMember,
       },
     });
-
-  }
-  catch(error){
+    
+  } catch (error) {
     res.status(500).json({
       message: error.message,
       error: "Internal Server Error",
     });
   }
-}
+};

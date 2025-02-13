@@ -21,21 +21,21 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // Ensures one cart per user
+      unique: true, 
     },
     items: [cartItemSchema],
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// 🔹 Virtual Field for Total Price Calculation
+// Virtual Field for Total Price Calculation
 cartSchema.virtual("totalPrice").get(function () {
   return this.items.reduce((total, item) => {
     return total + (item.product?.price || 0) * item.quantity;
   }, 0);
 });
 
-// 🔹 Middleware: Remove empty carts before saving
+// Middleware: Remove empty carts before saving
 cartSchema.pre("save", function (next) {
   if (this.items.length === 0) {
     this.remove();

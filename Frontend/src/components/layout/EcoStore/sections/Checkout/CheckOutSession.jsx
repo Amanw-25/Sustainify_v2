@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {useLocation, useNavigate } from 'react-router-dom';
-
 import { BASE_URL } from '../../../../../config';
 
 const CheckoutSuccess = () => {

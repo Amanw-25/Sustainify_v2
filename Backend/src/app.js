@@ -5,6 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import appconfig from "./config/appConfig.js";
 import Authrouter from "./routes/authRoute.js";
+import UserRouter from "./routes/UserRoute.js";
 import carbonFootPrintRouter from "./routes/carbonFootPrintRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import twilioRouter from "./routes/twilioRoute.js";
@@ -14,6 +15,7 @@ import MeetingRoute from "./routes/MeetingRoute.js";
 import socketHandler from "./socket.js";
 import CheckoutRouter from "./routes/checkoutRoute.js";
 import CartRouter from "./routes/CartRoute.js";
+import Subscription from "./routes/SubscriptionRoute.js";
 
 export const app = express();
 export const server = http.createServer(app);
@@ -39,6 +41,7 @@ app.use(
 
 // Routes
 app.use("/api/v1/sustainify/auth", Authrouter);
+app.use("/api/v1/sustainify/user", UserRouter);
 app.use("/api/v1/sustainify/carbon", carbonFootPrintRouter);
 app.use("/api/v1/sustainify/product", productRouter);
 app.use("/api/v1/sustainify/twilio", twilioRouter);
@@ -47,6 +50,7 @@ app.use("/api/v1/sustainify/event", EventRoute);
 app.use("/api/v1/sustainify/meeting", MeetingRoute);
 app.use("/api/v1/sustainify/checkout", CheckoutRouter);
 app.use("/api/v1/sustainify/cart", CartRouter);
+app.use("/api/v1/sustainify/subscription", Subscription);
 
 
 // Socket.io Connection

@@ -42,7 +42,8 @@ const Login = () => {
         type: "LOGIN_SUCCESS",
         payload: {
           token: data.token,
-          role: data.user.role
+          role: data.user.role,
+          isMember: data.user.isMember
         }
       });
   

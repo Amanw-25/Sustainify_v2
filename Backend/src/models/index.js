@@ -13,6 +13,7 @@ import EventRequest from './Event/EventRequestSchema.js';
 import Meeting from './Meeting/Meeting.js';
 import Booking from './Booking/BookingSchema.js';
 import Cart from './Product/CartSchema.js';
+import Subscription from './Blog/Subscription.js';
 
 export{
     User,
@@ -29,6 +30,7 @@ export{
     EventRequest,
     Meeting,
     Booking,
-    Cart
+    Cart,
+    Subscription
 
 };
