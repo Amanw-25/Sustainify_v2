@@ -25,6 +25,9 @@ import AdminApproval from '../components/layout/AdminDashboard/Events/EventAppro
 import ManageEvent from '../components/layout/AdminDashboard/Events/ManageEvent';
 import EventData from '../components/layout/AdminDashboard/Events/EventData';
 import EventCalendar from '../components/layout/AdminDashboard/Events/EventCalendar';
+import ManageOrder from '../components/layout/AdminDashboard/Product/ManageOrder';
+import ProductStat from '../components/layout/AdminDashboard/Product/ProductStat';
+import AddProduct from '../components/layout/AdminDashboard/Product/AddProduct';
 
 const Routers = () => {
   const { role } = useContext(AuthContext); // Get user role
@@ -56,10 +59,16 @@ const Routers = () => {
 
       {/* Admin Only Routes */}
       <Route path="/dashboard" element={role === "admin" ? <Dashboard /> : <Navigate to="/" />} />
+      
       <Route path="/event-approval" element={role === "admin" ? <AdminApproval /> : <Navigate to="/" />} />
       <Route path="/event-manage" element={role === "admin" ? <ManageEvent /> : <Navigate to="/" />} />
       <Route path="/event-data" element={role === "admin" ? <EventData /> : <Navigate to="/" />} />
       <Route path="/event-calendar" element={role === "admin" ? <EventCalendar /> : <Navigate to="/" />} />
+
+      <Route path="/manage-order" element={role === "admin" ? <ManageOrder /> : <Navigate to="/" />} />
+      <Route path="/product-stat" element={role === "admin" ? <ProductStat /> : <Navigate to="/" />} />
+      <Route path="/add-product" element={role === "admin" ? <AddProduct /> : <Navigate to="/" />} />
+
 
       {/* Redirect unknown routes */}
       <Route path="*" element={<Navigate to="/" />} />

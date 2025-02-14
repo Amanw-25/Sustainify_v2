@@ -3,17 +3,20 @@ import { authenticate, restrict } from "../middlewares/verifyToken.js";
 import { 
   getCheckoutSession, 
   verifyPayment,
-  getUserOrders 
+  getUserOrders,
+  getAllOrders,
+  updateOrderStatus
 } from '../controllers/Product/CheckoutController.js';
 
 const CheckoutRouter = express.Router();
 
 // User must be logged in to access these routes
 CheckoutRouter.use(authenticate);
-CheckoutRouter.use(restrict('user'));
 
 CheckoutRouter.post('/create-checkout-session', getCheckoutSession);
 CheckoutRouter.get('/verify-payment', verifyPayment);
-CheckoutRouter.get('/orders', getUserOrders);
+CheckoutRouter.get('/user/orders', getUserOrders);
+CheckoutRouter.get('/getallorders', getAllOrders);
+CheckoutRouter.put('/update-order-status/:id',updateOrderStatus);
 
 export default CheckoutRouter;

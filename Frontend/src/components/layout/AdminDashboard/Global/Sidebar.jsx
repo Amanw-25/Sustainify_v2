@@ -48,10 +48,11 @@ const menuItems = [
     ]
   },
   {
-    category: "Pages",
+    category: "Products",
     items: [
-      { title: "Profile Form", icon: <PersonOutlinedIcon />, to: "/form" },
-      { title: "Calendar", icon: <CalendarTodayOutlinedIcon />, to: "/calendar" },
+      { title: "Product Statistics", icon: <CalendarTodayOutlinedIcon />, to: "/product-stat" },
+      { title: "ManageOrder", icon: <PersonOutlinedIcon />, to: "/manage-order" },
+      { title: "Add Product", icon: <HelpOutlineOutlinedIcon />, to: "/add-product" }
     ]
   },
   {
