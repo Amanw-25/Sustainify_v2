@@ -50,16 +50,16 @@ const menuItems = [
   {
     category: "Products",
     items: [
-      { title: "Product Statistics", icon: <CalendarTodayOutlinedIcon />, to: "/product-stat" },
+      { title: "Product Statistics", icon: <CalendarTodayOutlinedIcon />, to: "/product-statistics" },
       { title: "ManageOrder", icon: <PersonOutlinedIcon />, to: "/manage-order" },
-      { title: "Add Product", icon: <HelpOutlineOutlinedIcon />, to: "/add-product" }
+      { title: "Manage Product", icon: <HelpOutlineOutlinedIcon />, to: "/manage-product" }
     ]
   },
   {
-    category: "Charts",
+    category: "Blog",
     items: [
-      { title: "Product Bar Chart", icon: <BarChartOutlinedIcon />, to: "/bar" },
-      { title: "Evnet Pie Chart", icon: <PieChartOutlineOutlinedIcon />, to: "/pie" },
+      { title: "Blog Data", icon: <BarChartOutlinedIcon />, to: "/blog-data" },
+      { title: "Manage Blog", icon: <PieChartOutlineOutlinedIcon />, to: "/manage-blog" },
       { title: "Subscription Line Chart", icon: <TimelineOutlinedIcon />, to: "/line" },
     ]
   }

@@ -13,7 +13,11 @@ import {
   Alert,
   Tooltip,
   Button,
+  IconButton,
+  Drawer,
+  useMediaQuery,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { toast } from "react-toastify";
 import Sidebar from "../Global/Sidebar";
 import { BASE_URL } from "../../../../config.js";
@@ -22,7 +26,10 @@ const ManageOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem("token");
+
+  const isMobile = useMediaQuery("(max-width: 1024px)");
 
   useEffect(() => {
     if (token) fetchOrders();
@@ -49,7 +56,7 @@ const ManageOrder = () => {
     let newStatus = "";
     if (currentStatus === "processing") newStatus = "shipped";
     else if (currentStatus === "shipped") newStatus = "delivered";
-    else return; 
+    else return;
 
     try {
       const response = await fetch(`${BASE_URL}/checkout/update-order-status/${orderId}`, {
@@ -80,9 +87,39 @@ const ManageOrder = () => {
 
   return (
     <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#f4f6f9" }}>
-      <Sidebar />
-      <Box sx={{ flex: 1, p: 3 }}>
-        <Typography variant="h2" fontWeight="bold" color="primary" sx={{ mb: 3 }}>
+      {isMobile && (
+        <IconButton
+          onClick={() => setSidebarOpen(true)}
+          sx={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            zIndex: 10,
+            backgroundColor: "white",
+            boxShadow: 2,
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
+
+      {!isMobile && (
+        <Box sx={{ width: "250px" }}>
+          <Sidebar />
+        </Box>
+      )}
+
+      <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+        <Sidebar />
+      </Drawer>
+
+      <Box sx={{ flex: 1, p: 3, width: "100%" }}>
+        <Typography
+          variant={isMobile ? "h4" : "h2"}
+          fontWeight="bold"
+          color="primary"
+          sx={{ mb: 3, textAlign: isMobile ? "center" : "left" }}
+        >
           Manage Orders
         </Typography>
 
@@ -97,7 +134,16 @@ const ManageOrder = () => {
             No orders found.
           </Typography>
         ) : (
-          <TableContainer component={Paper} sx={{ maxHeight: "80vh", overflowY: "auto", borderRadius: 2, boxShadow: 3 }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: "80vh",
+              overflowY: "auto",
+              borderRadius: 2,
+              boxShadow: 3,
+              overflowX: "auto",
+            }}
+          >
             <Table stickyHeader>
               <TableHead sx={{ backgroundColor: "#3B82F6" }}>
                 <TableRow>
@@ -112,6 +158,7 @@ const ManageOrder = () => {
                           top: 0,
                           backgroundColor: "#3B82F6",
                           zIndex: 2,
+                          minWidth: isMobile ? "150px" : "auto",
                         }}
                       >
                         {head}
@@ -123,7 +170,7 @@ const ManageOrder = () => {
               <TableBody>
                 {orders.map(({ _id, user, orderItems, totalAmount, paymentStatus, orderStatus, shippingAddress }) => (
                   <TableRow key={_id} hover>
-                    <TableCell sx={{ position: "sticky", left: 0, backgroundColor: "#fff", zIndex: 1 }}>
+                    <TableCell>
                       <Tooltip title={_id}>
                         <span>{_id.slice(0, 8)}...</span>
                       </Tooltip>
@@ -143,7 +190,12 @@ const ManageOrder = () => {
                       <Box sx={{ color: paymentStatus === "completed" ? "#22C55E" : "#EF4444", fontWeight: 500 }}>
                         Payment: {paymentStatus}
                       </Box>
-                      <Box sx={{ color: orderStatus === "processing" ? "#EAB308" : orderStatus === "shipped" ? "#22C55E" : "#10B981", fontWeight: 500 }}>
+                      <Box
+                        sx={{
+                          color: orderStatus === "processing" ? "#EAB308" : orderStatus === "shipped" ? "#22C55E" : "#10B981",
+                          fontWeight: 500,
+                        }}
+                      >
                         Order: {orderStatus}
                       </Box>
                     </TableCell>

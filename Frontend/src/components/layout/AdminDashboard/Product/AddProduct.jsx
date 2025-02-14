@@ -114,7 +114,7 @@ const AddProduct = () => {
         shortdescription: data.product.shortdescription,
         description: data.product.description,
         specifications: Array.isArray(data.product.specifications)
-          ? data.product.specifications.join("\n")
+          ? data.product.specifications.join("\n") // ✅ Convert array to multi-line string
           : "",
         price: data.product.price,
         carbonFootprint: data.product.carbonFootprint,
@@ -124,7 +124,7 @@ const AddProduct = () => {
         images: data.images || [],
       });
   
-      setPreviewImages(data.product.images?.map((img) => img.url) || []); 
+      setPreviewImages(data.product.images?.map((img) => img.url) || []);
   
       setEditingProduct(data.product);
       setOpenModal(true);
@@ -134,6 +134,7 @@ const AddProduct = () => {
       setLoading(false);
     }
   };
+  
   
   
 
@@ -184,7 +185,8 @@ const AddProduct = () => {
             formData.append("images", image);
           });
         } else if (key === "specifications") {
-          const specs = form.specifications.split("\n").filter((spec) => spec.trim());
+          // ✅ Convert multi-line text into an array
+          const specs = form.specifications.split("\n").map((spec) => spec.trim()).filter(Boolean);
           formData.append("specifications", JSON.stringify(specs));
         } else {
           formData.append(key, form[key]);
@@ -212,6 +214,7 @@ const AddProduct = () => {
       setLoading(false);
     }
   };
+  
   
 
   const resetForm = () => {
