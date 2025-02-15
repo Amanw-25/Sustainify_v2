@@ -20,6 +20,9 @@ import SubscriptionSuccess from '../components/layout/EcoPractice/sections/BlogD
 import Event from '../components/pages/Event';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
 
+
+import Community from '../components/layout/EcoCommunity/Community';
+
 import Dashboard from '../components/layout/AdminDashboard/Dashboard';
 import AdminApproval from '../components/layout/AdminDashboard/Events/EventApproval';
 import ManageEvent from '../components/layout/AdminDashboard/Events/ManageEvent';
@@ -58,6 +61,9 @@ const Routers = () => {
 
       <Route path="/event" element={<Event />} />
       <Route path="/event-details/:id" element={<EventsDetails />} />
+
+
+      <Route path="/eco-community" element={<Community />} />
 
       {/* Admin Only Routes */}
       <Route path="/dashboard" element={role === "admin" ? <Dashboard /> : <Navigate to="/" />} />

@@ -230,15 +230,26 @@ export const updateBlogPost = async (req, res) => {
 
 export const deleteBlogPost = async (req, res) => {
   const { id } = req.params;
-  const user = req.userId;
+  const userId = req.userId; 
+  const userRole = req.role; 
+
   try {
-    const blogPost = await BlogPost.findOneAndDelete({ _id: id, author: user });
+    const blogPost = await BlogPost.findById(id);
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        message: "Blog post not found or unauthorized",
+        message: "Blog post not found",
       });
     }
+
+    if (blogPost.author.toString() !== userId && userRole !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: You can only delete your own blog post",
+      });
+    }
+
+    await BlogPost.findByIdAndDelete(id);
 
     res.json({
       success: true,
@@ -253,3 +264,4 @@ export const deleteBlogPost = async (req, res) => {
     });
   }
 };
+

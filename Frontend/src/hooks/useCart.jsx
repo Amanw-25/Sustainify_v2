@@ -15,7 +15,7 @@ export const useCart = () => {
       if (response.ok) {
         setCart(data);
       } else {
-        setCart({ items: [] }); // Match the controller's empty cart response
+        setCart({ items: [] }); 
       }
     } catch (error) {
       console.error("Cart fetch error:", error);
@@ -33,13 +33,13 @@ export const useCart = () => {
         },
         body: JSON.stringify({ 
           productId: product._id, 
-          quantity: Math.max(1, quantity) // Ensure quantity is at least 1
+          quantity: Math.max(1, quantity) 
         }),
       });
       
       const data = await response.json();
       if (response.ok) {
-        setCart(data); // Use the returned cart data directly
+        setCart(data);
         return true;
       }
       return false;
@@ -62,7 +62,7 @@ export const useCart = () => {
   
       const data = await response.json();
       if (response.ok) {
-        setCart(data); // Use the returned cart data
+        setCart(data);
         return true;
       }
       return false;
@@ -81,7 +81,7 @@ export const useCart = () => {
   
       const data = await response.json();
       if (response.ok) {
-        setCart(data); // Use the returned cart data
+        setCart(data);
         return true;
       }
       return false;
