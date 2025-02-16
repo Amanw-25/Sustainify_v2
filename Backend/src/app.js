@@ -1,8 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import http from "http";
-import { Server } from "socket.io";
 import appconfig from "./config/appConfig.js";
 
 // Import Routes
@@ -17,25 +15,15 @@ import MeetingRoute from "./routes/MeetingRoute.js";
 import CheckoutRouter from "./routes/checkoutRoute.js";
 import CartRouter from "./routes/CartRoute.js";
 import Subscription from "./routes/SubscriptionRoute.js";
-import CommunityRouter from "./routes/CommunityRoute.js";
 
 export const app = express();
-export const server = http.createServer(app);
-
-export const io = new Server(server, {
-  cors: {
-    origin: "*", 
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "*",
+    origin: appconfig.REACT_APP_BASE_URL,    
     credentials: true,
     optionsSuccessStatus: 200,
   })
@@ -53,4 +41,3 @@ app.use("/api/v1/sustainify/meeting", MeetingRoute);
 app.use("/api/v1/sustainify/checkout", CheckoutRouter);
 app.use("/api/v1/sustainify/cart", CartRouter);
 app.use("/api/v1/sustainify/subscription", Subscription);
-app.use("/api/v1/sustainify/community", CommunityRouter);

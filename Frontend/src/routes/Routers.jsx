@@ -6,6 +6,7 @@ import Login from '../components/pages/Login';
 import Signup from '../components/pages/Signup';
 import Contact from '../components/pages/Contact';
 import CarbonFootprint from '../components/pages/CarbonFootprint';
+import Profile from '../components/layout/Profile/Profile';
 
 import EcoStore from '../components/pages/Eco-Store';
 import ProductDetails from '../components/layout/EcoStore/sections/ProductDetails/ProductDetails';
@@ -21,7 +22,6 @@ import Event from '../components/pages/Event';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
 
 
-import Community from '../components/layout/EcoCommunity/Community';
 
 import Dashboard from '../components/layout/AdminDashboard/Dashboard';
 import AdminApproval from '../components/layout/AdminDashboard/Events/EventApproval';
@@ -45,6 +45,7 @@ const Routers = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Signup />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/profile" element={<Profile />} />
 
       <Route path="/eco-store" element={<EcoStore />} />
       <Route path="/carbon-footprint-tracker" element={<CarbonFootprint />} /> 
@@ -63,7 +64,6 @@ const Routers = () => {
       <Route path="/event-details/:id" element={<EventsDetails />} />
 
 
-      <Route path="/eco-community" element={<Community />} />
 
       {/* Admin Only Routes */}
       <Route path="/dashboard" element={role === "admin" ? <Dashboard /> : <Navigate to="/" />} />
