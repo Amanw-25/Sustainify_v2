@@ -1,5 +1,5 @@
-import { CarbonFootprint } from "../models/index.js";
-import { User } from "../models/index.js";
+import { CarbonFootprint } from "../../models/index.js";
+import { User } from "../../models/index.js";
 import { spawn } from "child_process";
 
 const validateFields = (fields, requiredFields) => {
@@ -197,3 +197,24 @@ export const chatWithMistralAI = async (req, res) => {
   }
 };
 
+
+export const getCarbonFootprint = async (req, res) => {
+  try{
+    const carbonData = await CarbonFootprint.find({ user: req.userId })
+
+    if (!carbonData || carbonData.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Carbon footprint data not found for the user." });
+    }
+
+    return res.json(carbonData);
+  }
+  catch(error){
+    console.error("Error in getCarbonFootprint:", error);
+    return res.status(500).json({
+      error: "An error occurred while processing the request",
+      details: error.message,
+    });
+  }
+}

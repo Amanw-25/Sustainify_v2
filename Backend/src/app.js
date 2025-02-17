@@ -15,6 +15,9 @@ import MeetingRoute from "./routes/MeetingRoute.js";
 import CheckoutRouter from "./routes/checkoutRoute.js";
 import CartRouter from "./routes/CartRoute.js";
 import Subscription from "./routes/SubscriptionRoute.js";
+import BadgeRouter from "./routes/badgeRoutes.js";
+import testRouter from "./routes/badgeTestRoutes.js";
+import './config/cron.js';
 
 export const app = express();
 
@@ -41,3 +44,5 @@ app.use("/api/v1/sustainify/meeting", MeetingRoute);
 app.use("/api/v1/sustainify/checkout", CheckoutRouter);
 app.use("/api/v1/sustainify/cart", CartRouter);
 app.use("/api/v1/sustainify/subscription", Subscription);
+app.use("/api/v1/sustainify/badge", BadgeRouter);
+app.use("/api/v1/sustainify/test", testRouter);

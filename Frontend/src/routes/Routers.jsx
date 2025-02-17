@@ -20,6 +20,7 @@ import SubscriptionSuccess from '../components/layout/EcoPractice/sections/BlogD
 
 import Event from '../components/pages/Event';
 import EventsDetails from '../components/layout/Events/section/Event/EventDetails';
+import BadgeView from '../components/layout/Profile/section/BadgeView';
 
 
 
@@ -46,6 +47,8 @@ const Routers = () => {
       <Route path="/register" element={<Signup />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/badges/:badgeId" element={<BadgeView />} />
+
 
       <Route path="/eco-store" element={<EcoStore />} />
       <Route path="/carbon-footprint-tracker" element={<CarbonFootprint />} /> 

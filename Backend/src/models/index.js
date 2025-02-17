@@ -14,6 +14,7 @@ import Meeting from './Meeting/Meeting.js';
 import Booking from './Booking/BookingSchema.js';
 import Cart from './Product/CartSchema.js';
 import Subscription from './Blog/Subscription.js';
+import Badge from './Badge/Badge.js';
 
 export{
     User,
@@ -31,5 +32,6 @@ export{
     Meeting,
     Booking,
     Cart,
-    Subscription
+    Subscription,
+    Badge
 };

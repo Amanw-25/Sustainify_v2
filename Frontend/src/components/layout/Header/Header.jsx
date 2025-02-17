@@ -31,7 +31,7 @@ const Header = () => {
   const colorMode = useContext(ColorModeContext);
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState(userImg);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -45,8 +45,8 @@ const Header = () => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleMenu = () => {
@@ -54,12 +54,15 @@ const Header = () => {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate("/profile");
   };
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!token) return;
+      if (!token) {
+        setProfilePhoto(null);
+        return;
+      }
 
       try {
         const res = await fetch(`${BASE_URL}/user/profile`, {
@@ -71,12 +74,21 @@ const Header = () => {
         });
 
         if (!res.ok) {
+          // If token is invalid or expired, clean up
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            setToken(null);
+            setProfilePhoto(null);
+          }
           throw new Error("Failed to fetch user data");
         }
 
         const data = await res.json();
-        if (data.user.profilePhoto) {
+        // Set profile photo if it exists, otherwise keep null to use default
+        if (data.user && data.user.profilePhoto) {
           setProfilePhoto(data.user.profilePhoto);
+        } else {
+          setProfilePhoto(null);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -94,9 +106,37 @@ const Header = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuRef]);
+
+  // Render profile photo or login button based on token presence
+  const renderUserAction = () => {
+    if (!token) {
+      return (
+        <Link to="/login" className="hidden md:block">
+          <button className="bg-primaryColor py-2 px-4 md:px-6 text-white text-sm md:text-base font-[600] h-[40px] md:h-[44px] flex items-center justify-center rounded-[50px] transition-transform hover:scale-105">
+            Login
+          </button>
+        </Link>
+      );
+    } else {
+      return (
+        <div
+          onClick={handleProfileClick}
+          className="hidden md:block cursor-pointer"
+        >
+          <figure className="w-[45px] h-[45px] md:w-[50px] md:h-[50px] border-2 border-gray-300 rounded-full overflow-hidden transition-transform hover:scale-105">
+            <img
+              src={profilePhoto || userImg}
+              className="w-full h-full object-cover"
+              alt="User Profile"
+            />
+          </figure>
+        </div>
+      );
+    }
+  };
 
   const renderDropdownItems = navListMenuItems.map(
     ({ icon, title, description, path }, key) => (
@@ -209,26 +249,8 @@ const Header = () => {
               </IconButton>
             </Box>
 
-            {token ? (
-              <div 
-                onClick={handleProfileClick}
-                className="hidden md:block cursor-pointer"
-              >
-                <figure className="w-[45px] h-[45px] md:w-[50px] md:h-[50px] border-2 border-gray-300 rounded-full overflow-hidden transition-transform hover:scale-105">
-                  <img
-                    src={profilePhoto}
-                    className="w-full h-full object-cover"
-                    alt="User Profile"
-                  />
-                </figure>
-              </div>
-            ) : (
-              <Link to="/login" className="hidden md:block">
-                <button className="bg-primaryColor py-2 px-4 md:px-6 text-white text-sm md:text-base font-[600] h-[40px] md:h-[44px] flex items-center justify-center rounded-[50px] transition-transform hover:scale-105">
-                  Login
-                </button>
-              </Link>
-            )}
+            {/* Conditionally render login button or profile photo */}
+            {renderUserAction()}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -259,10 +281,10 @@ const Header = () => {
             <AiOutlineClose className="w-6 h-6" />
           </button>
         </div>
-        
-        {token && (
+
+        {token ? (
           <div className="p-4 border-b border-gray-200">
-            <div 
+            <div
               onClick={() => {
                 handleProfileClick();
                 toggleMenu();
@@ -271,7 +293,7 @@ const Header = () => {
             >
               <figure className="w-[45px] h-[45px] border-2 border-gray-300 rounded-full overflow-hidden">
                 <img
-                  src={profilePhoto}
+                  src={profilePhoto || userImg}
                   className="w-full h-full object-cover"
                   alt="User Profile"
                 />
@@ -279,7 +301,7 @@ const Header = () => {
               <span className="text-gray-800 font-medium">My Profile</span>
             </div>
           </div>
-        )}
+        ) : null}
 
         <nav className="p-4">
           <ul className="flex flex-col space-y-4">
@@ -333,7 +355,7 @@ const Header = () => {
             ))}
           </ul>
         </nav>
-        
+
         {!token && (
           <div className="p-4 border-t border-gray-200">
             <Link to="/login" onClick={toggleMenu}>
