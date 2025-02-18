@@ -11,6 +11,7 @@ import {
   getBlogReviews,
   updateBlogReview,
 } from "../controllers/Blog/BlogReviewController.js";
+import { saveBlog,getSavedBlog,deleteSavedBlog } from "../controllers/Blog/SavedBlogController.js";
 import { authenticate } from "../middlewares/verifyToken.js";
 import upload from "../middlewares/upload.js";
 
@@ -39,5 +40,11 @@ BlogRouter.delete("/deleteBlogPost/:id", authenticate, deleteBlogPost);
 BlogRouter.post("/createBlogReview/:id", authenticate, createBlogReview);
 BlogRouter.get("/getBlogReviews/:blogPostId", getBlogReviews);
 BlogRouter.put("/updateBlogReview/:reviewId", authenticate, updateBlogReview);
+
+
+// Saved Blog
+BlogRouter.post("/saveBlog", authenticate, saveBlog);
+BlogRouter.get("/getSavedBlog", authenticate, getSavedBlog);
+BlogRouter.delete("/deleteSavedBlog/:id", authenticate, deleteSavedBlog);
 
 export default BlogRouter;

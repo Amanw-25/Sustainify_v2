@@ -3,7 +3,7 @@ import { generatePDFTicket } from "./Ticket/pdfController.js";
 import nodemailer from "nodemailer";
 import { User } from "../../models/index.js";
 import appconfig from "../../config/appConfig.js";
-import { generateQRCode } from './Ticket/qrController.js';
+import { generateQRCode } from "./Ticket/qrController.js";
 
 export const requestToJoinEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -117,10 +117,19 @@ export const approveRequest = async (req, res) => {
     await request.save();
 
     // 1️⃣ Generate QR Code
-    const qrCodePath = await generateQRCode(requestId, request.userId, request.eventId);
+    const qrCodePath = await generateQRCode(
+      requestId,
+      request.userId,
+      request.eventId
+    );
 
     // 2️⃣ Generate PDF Ticket
-    const ticketPath = await generatePDFTicket(requestId, request.userId, request.eventId, qrCodePath);
+    const ticketPath = await generatePDFTicket(
+      requestId,
+      request.userId,
+      request.eventId,
+      qrCodePath
+    );
 
     // 3️⃣ Send Email with Attachment
     const transporter = nodemailer.createTransport({
@@ -200,7 +209,8 @@ export const approveRequest = async (req, res) => {
     const emailResponse = await transporter.sendMail(mailOptions);
 
     res.status(200).json({
-      message: "Request approved, ticket generated, and email sent successfully",
+      message:
+        "Request approved, ticket generated, and email sent successfully",
       request,
       emailResponse,
     });
@@ -242,14 +252,18 @@ export const rejectRequest = async (req, res) => {
           <body>
             <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #f1f1f1; border-radius: 10px; max-width: 600px; margin: auto; background-color: #f9f9f9;">
               <h2 style="text-align: center; color: #F44336;">Event Request Rejected</h2>
-              <p style="font-size: 16px; color: #555;">Dear <strong>${request.userId.name}</strong>,</p>
+              <p style="font-size: 16px; color: #555;">Dear <strong>${
+                request.userId.name
+              }</strong>,</p>
               
               <p style="font-size: 16px; color: #555;">We regret to inform you that your request to join the event has been <strong>rejected</strong>. Below are the details of the event:</p>
               
               <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; margin-top: 20px;">
                 <h3 style="color: #D32F2F;">Event Details:</h3>
                 <p><strong>Name:</strong> ${request.eventId.name}</p>
-                <p><strong>Date:</strong> ${new Date(request.eventId.date).toLocaleDateString()}</p>
+                <p><strong>Date:</strong> ${new Date(
+                  request.eventId.date
+                ).toLocaleDateString()}</p>
                 <p><strong>Time:</strong> ${request.eventId.time}</p>
                 <p><strong>Location:</strong> ${request.eventId.location}</p>
               </div>
@@ -281,7 +295,7 @@ export const rejectRequest = async (req, res) => {
         </html>
       `,
     };
-    
+
     const emailResponse = await transporter.sendMail(mailOptions);
 
     res.status(200).json({
@@ -307,5 +321,25 @@ export const getRequests = async (req, res) => {
       .json({ message: "Requests fetched successfully", requests });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getUserEventRequests = async (req, res) => {
+  const id = req.userId;
+  try {
+    const requests = await EventRequest.find({ userId: id }).populate(
+      "eventId",
+      "name date time location image"
+    );
+    if (!requests) throw new Error("No requests found for this user");
+    res.status(200).json({
+      message: "User event requests fetched successfully",
+      requests,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "Error fetching user event requests",
+      error: error.message,
+    });
   }
 };

@@ -5,7 +5,6 @@ import { BASE_URL } from "../../../../../config.js";
 import { FaStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import Loader from "../../../../../Loader/Loading.jsx";
 import Error from "../../../../../Error/Error.jsx";
 import CommentSection from "./comment";
@@ -17,6 +16,7 @@ const BlogDetails = () => {
   const [likes, setLikes] = useState(0);
   const [claps, setClaps] = useState(0);
   const [isMember, setIsMember] = useState(false);
+  const { id: blogId } = useParams(); 
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -84,6 +84,39 @@ const BlogDetails = () => {
         toast.error("Failed to copy URL");
         console.error("Failed to copy URL: ", err);
       });
+  };
+
+  const handleSavedClick = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to save this blog");
+      return;
+    }
+  
+    if (!blogId) {
+      toast.error("Invalid blog ID");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${BASE_URL}/blog/saveBlog?blogId=${blogId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error saving blog:", error);
+      toast.error("Error saving blog");
+    }
   };
 
   if (!article) {
@@ -184,7 +217,7 @@ const BlogDetails = () => {
             <IconButton color="primary" onClick={handleShareClick}>
               <FaShare style={{ color: "#6b7280" }} />
             </IconButton>
-            <IconButton color="primary">
+            <IconButton color="primary" onClick={handleSavedClick}>
               <FaBookmark style={{ color: "#6b7280" }} />
             </IconButton>
           </div>

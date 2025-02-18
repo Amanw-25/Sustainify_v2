@@ -1,6 +1,6 @@
 import express from 'express';
 import { addEvent, getAllEvents, updateEvent, getEventById, deleteEvent } from '../controllers/Event/EventController.js';
-import { requestToJoinEvent, approveRequest, getRequests ,rejectRequest } from "../controllers/Event/EventRequestController.js";
+import { requestToJoinEvent, approveRequest, getRequests ,rejectRequest,getUserEventRequests } from "../controllers/Event/EventRequestController.js";
 import { addEventRating, updateEventRating, getEventRating } from '../controllers/Event/EventRating.js';
 import upload from "../middlewares/upload.js";
 import { authenticate, restrict } from '../middlewares/verifyToken.js';
@@ -21,5 +21,5 @@ EventRoute.post("/request/:eventId", authenticate, requestToJoinEvent);
 EventRoute.put("/approve/:requestId", authenticate, restrict('admin'), approveRequest);
 EventRoute.put("/reject/:requestId", authenticate, restrict('admin'), rejectRequest);
 EventRoute.get("/requests", authenticate, restrict('admin'), getRequests);
-
+EventRoute.get("/userRequests", authenticate, getUserEventRequests);
 export default EventRoute;
