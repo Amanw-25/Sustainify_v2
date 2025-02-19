@@ -10,10 +10,16 @@ import {
   Box,
   Chip,
   Divider,
-  Grid
+  Grid,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 
 const ProductOrders = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,7 +49,6 @@ const ProductOrders = () => {
           throw new Error(data.message || "Failed to fetch orders.");
         }
 
-        // Sort orders by date (newest first)
         const sortedOrders = data.orders.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -64,7 +69,6 @@ const ProductOrders = () => {
     setPage(value);
   };
 
-  // Get current order based on pagination
   const getCurrentOrder = () => {
     return orders[page - 1];
   };
@@ -90,18 +94,32 @@ const ProductOrders = () => {
 
   const currentOrder = getCurrentOrder();
   return (
-    <Box>
+    <Box sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
       {currentOrder && (
-        <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-          {/* Order Header */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h4" component="h3" sx={{ fontWeight: 'bold' }}>
+        <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between', 
+            alignItems: { xs: 'flex-start', sm: 'center' }, 
+            gap: { xs: 2, sm: 0 },
+            mb: 2 
+          }}>
+            <Typography 
+              variant={isMobile ? "h5" : "h4"} 
+              component="h3" 
+              sx={{ 
+                fontWeight: 'bold',
+                wordBreak: 'break-word'
+              }}
+            >
               Order ID: {currentOrder._id}
             </Typography>
             <Chip 
               label={currentOrder.orderStatus}
               color={getStatusColor(currentOrder.orderStatus)}
               variant="outlined"
+              sx={{ alignSelf: { xs: 'flex-start', sm: 'center' } }}
             />
           </Box>
 
@@ -112,7 +130,11 @@ const ProductOrders = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary" align="right">
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                align={isMobile ? "left" : "right"}
+              >
                 Payment Status: {currentOrder.paymentStatus}
               </Typography>
             </Grid>
@@ -120,17 +142,18 @@ const ProductOrders = () => {
 
           <Divider sx={{ my: 2 }} />
 
-          {/* Order Items */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2 ,fontWeight:"bold" }}>Order Items:</Typography>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: "bold" }}>
+              Order Items:
+            </Typography>
             {currentOrder.orderItems.map((item) => (
               <Paper 
                 key={item._id} 
                 variant="outlined" 
-                sx={{ p: 2, mb: 2 }}
+                sx={{ p: { xs: 1, sm: 2 }, mb: 2 }}
               >
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={2}>
+                  <Grid item xs={4} sm={2}>
                     <img
                       src={item.product.images[0].url || '/default-product-image.png'}
                       alt={item.productName}
@@ -143,14 +166,31 @@ const ProductOrders = () => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" sx={{fontWeight:"bold"}}>{item.productName}</Typography>
-                    <Typography variant="body2" color="text.secondary">
+                  <Grid item xs={8} sm={6}>
+                    <Typography 
+                      variant={isMobile ? "body1" : "subtitle2"} 
+                      sx={{fontWeight:"bold"}}
+                    >
+                      {item.productName}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ 
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}
+                    >
                       {item.product.shortdescription}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <Box sx={{ textAlign: 'right' }}>
+                    <Box sx={{ 
+                      textAlign: { xs: 'left', sm: 'right' },
+                      mt: { xs: 1, sm: 0 }
+                    }}>
                       <Typography variant="body2">Quantity: {item.quantity}</Typography>
                       <Typography variant="subtitle2">₹{item.price}</Typography>
                     </Box>
@@ -162,12 +202,18 @@ const ProductOrders = () => {
 
           <Divider sx={{ my: 2 }} />
 
-          {/* Order Summary */}
           <Box sx={{ mb: 2 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               Total Amount: ₹{currentOrder.totalAmount}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ 
+                wordBreak: 'break-word',
+                whiteSpace: 'pre-line'
+              }}
+            >
               Shipping Address: {currentOrder.shippingAddress.street}, 
               {currentOrder.shippingAddress.city}, {currentOrder.shippingAddress.state} - 
               {currentOrder.shippingAddress.zipCode}, {currentOrder.shippingAddress.country}
@@ -176,15 +222,24 @@ const ProductOrders = () => {
         </Paper>
       )}
 
-      {/* Pagination */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        mt: 3,
+        mb: { xs: 4, sm: 3 }
+      }}>
         <Stack spacing={2}>
           <Pagination
             count={totalOrders}
             page={page}
             onChange={handleChangePage}
             color="primary"
-            size="large"
+            size={isMobile ? "medium" : "large"}
+            sx={{
+              '& .MuiPaginationItem-root': {
+                margin: { xs: '0 2px', sm: '0 4px' }
+              }
+            }}
           />
         </Stack>
       </Box>

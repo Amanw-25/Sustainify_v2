@@ -78,8 +78,8 @@ const CarbonFootprint = () => {
           id: "Total Emissions",
           color: "hsl(96, 70%, 50%)",
           data: data.map((entry, index) => ({
-            x: `Reading ${index + 1}`, // Label for the x-axis
-            y: entry.Total || 0, // Total Emissions
+            x: `${index + 1}`, 
+            y: entry.Total || 0, 
           })),
         },
       ];

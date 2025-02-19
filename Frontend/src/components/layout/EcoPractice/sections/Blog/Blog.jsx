@@ -19,7 +19,6 @@ const Blog = () => {
   const totalBlogs = blogs.length;
   const totalPages = Math.ceil(totalBlogs / blogsPerPage);
 
-  // Filter blogs based on category and pagination
   const displayedBlogs = selectedCategory
     ? blogs.filter((blog) => blog.tags.includes(selectedCategory))
     : blogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);

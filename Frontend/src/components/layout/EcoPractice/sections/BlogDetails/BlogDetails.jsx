@@ -1,30 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { FaHeart, FaShare, FaHandsClapping, FaBookmark } from "react-icons/fa6";
-import { Typography, IconButton, Divider } from "@mui/material";
+import {
+  Typography,
+  IconButton,
+  Divider,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
+import {
+  FaHeart,
+  FaShare,
+  FaHandsClapping,
+  FaBookmark,
+  FaStar,
+  FaArrowLeft,
+} from "react-icons/fa6";
 import { BASE_URL } from "../../../../../config.js";
-import { FaStar } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Loader from "../../../../../Loader/Loading.jsx";
-import Error from "../../../../../Error/Error.jsx";
 import CommentSection from "./comment";
 import SubscriptionPlans from "./SubscriptionPlans.jsx";
 
 const BlogDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const isSmallScreen = useMediaQuery("(max-width: 960px)");
   const [article, setArticle] = useState(null);
   const [likes, setLikes] = useState(0);
   const [claps, setClaps] = useState(0);
   const [isMember, setIsMember] = useState(false);
-  const { id: blogId } = useParams(); 
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      try {
         const response = await fetch(`${BASE_URL}/user/profile`, {
           method: "GET",
           headers: {
@@ -41,18 +52,13 @@ const BlogDetails = () => {
       }
     };
 
-    fetchUserData();
-
     const fetchArticleDetails = async () => {
       try {
-        const response = await fetch(
-          `${BASE_URL}/blog/getSingleBlogPost/${id}`
-        );
+        const response = await fetch(`${BASE_URL}/blog/getSingleBlogPost/${id}`);
         const data = await response.json();
         if (data.success && data.data) {
-          const articleData = data.data;
-          setArticle(articleData);
-          setLikes(articleData.likes || 0);
+          setArticle(data.data);
+          setLikes(data.data.likes || 0);
           setClaps(0);
         }
       } catch (err) {
@@ -60,30 +66,18 @@ const BlogDetails = () => {
       }
     };
 
-    if (id) {
-      fetchArticleDetails();
-    }
+    fetchUserData();
+    if (id) fetchArticleDetails();
   }, [id]);
 
-  const handleLike = () => {
-    setLikes((prev) => prev + 1);
-  };
-
-  const handleClap = () => {
-    setClaps((prev) => prev + 1);
-  };
+  const handleLike = () => setLikes((prev) => prev + 1);
+  const handleClap = () => setClaps((prev) => prev + 1);
 
   const handleShareClick = () => {
-    const currentUrl = window.location.href;
     navigator.clipboard
-      .writeText(currentUrl)
-      .then(() => {
-        toast.success("Blog URL copied to clipboard!");
-      })
-      .catch((err) => {
-        toast.error("Failed to copy URL");
-        console.error("Failed to copy URL: ", err);
-      });
+      .writeText(window.location.href)
+      .then(() => toast.success("Blog URL copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy URL"));
   };
 
   const handleSavedClick = async () => {
@@ -92,154 +86,120 @@ const BlogDetails = () => {
       toast.error("Please login to save this blog");
       return;
     }
-  
-    if (!blogId) {
-      toast.error("Invalid blog ID");
-      return;
-    }
-  
+
     try {
-      const response = await fetch(`${BASE_URL}/blog/saveBlog?blogId=${blogId}`, {
+      const response = await fetch(`${BASE_URL}/blog/saveBlog?blogId=${id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       const data = await response.json();
-      if (data.success) {
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
+      data.success ? toast.success(data.message) : toast.error(data.message);
     } catch (error) {
       console.error("Error saving blog:", error);
       toast.error("Error saving blog");
     }
   };
 
-  if (!article) {
-    return (
-      <div>
-        <Loader />
-      </div>
-    );
-  }
+  if (!article) return <Loader />;
 
   return (
     <section style={{ background: "white", padding: "60px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        {article.isMemberOnly && (
-          <span style={{ display: "inline-flex", alignItems: "center" }}>
-            <FaStar
-              style={{ color: "#F6BE14", fontSize: "24px", marginRight: "8px" }}
-            />
-            Member only story
-          </span>
+        {isSmallScreen && (
+          <Button
+            startIcon={<FaArrowLeft />}
+            onClick={() => navigate("/blog")}
+            sx={{ marginBottom: 2 }}
+          >
+            Back
+          </Button>
         )}
 
-        <Divider style={{ margin: "16px 0" }} />
-        <div style={{ textAlign: "left", marginBottom: "32px" }}>
+        {article.isMemberOnly && (
           <Typography
-            variant="h1"
-            style={{ fontWeight: "bold", marginBottom: "8px" }}
+            variant="body1"
+            sx={{ display: "flex", alignItems: "center", fontWeight: "bold" }}
           >
-            {article.title || "No title available"}
+            <FaStar color="#F6BE14" size={20} style={{ marginRight: 8 }} />
+            Member only story
           </Typography>
-          <Typography
-            variant="h3"
-            style={{ color: "#6b7280", marginBottom: "16px" }}
-          >
-            {article.kicker || "No subtitle available"}
-          </Typography>
-          <Typography variant="subtitle1" style={{ color: "#6b7280" }}>
-            By {article.author.name || "Unknown author"} |{" "}
-            {new Date(article.createdAt).toLocaleDateString() || "Unknown date"}{" "}
-            | {article.readTime || "N/A"} min read
-          </Typography>
-        </div>
+        )}
 
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap">
-            {article.tags && article.tags.length > 0 ? (
-              <>
-                <span className="bg-gray-400 px-3 py-1 rounded-full text-sm text-gray-700 sm:hidden flex space-x-8">
-                  <span>{article.tags[0]}</span>
-                  <span>{article.tags[1]}</span>
-                </span>
+        <Divider sx={{ my: 2 }} />
 
-                <div className="hidden sm:flex flex-wrap gap-2">
-                  {article.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-400 px-3 py-1 rounded-full text-sm text-gray-700"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <span>No tags available</span>
-            )}
+        <Typography variant="h1" fontWeight="bold" >
+          {article.title || "No title available"}
+        </Typography>
+        <Typography variant="h5" color="text.secondary" sx={{ mb: 2 }}>
+          {article.kicker || "No subtitle available"}
+        </Typography>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+          By {article.author.name || "Unknown author"} |{" "}
+          {new Date(article.createdAt).toLocaleDateString() || "Unknown date"} |{" "}
+          {article.readTime || "N/A"} min read
+        </Typography>
+
+        {article.tags?.length > 0 && (
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
+            {article.tags.map((tag, index) => (
+              <span
+                key={index}
+                style={{
+                  background: "#e0e0e0",
+                  padding: "4px 12px",
+                  borderRadius: "20px",
+                  fontSize: "14px",
+                  color: "#555",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
-        </div>
+        )}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "24px",
-            marginTop: "16px",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={{ display: "flex", gap: "16px" }}>
-            <IconButton
-              color="primary"
-              onClick={handleLike}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
-            >
-              <FaHeart style={{ color: "#ef4444" }} />
-              <Typography variant="body1">{likes}</Typography>
+            <IconButton color="primary" onClick={handleLike}>
+              <FaHeart color="#ef4444" />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                {likes}
+              </Typography>
             </IconButton>
-            <IconButton
-              color="primary"
-              onClick={handleClap}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
-            >
-              <FaHandsClapping style={{ color: "#3b82f6" }} />
-              <Typography variant="body1">{claps}</Typography>
+            <IconButton color="primary" onClick={handleClap}>
+              <FaHandsClapping color="#3b82f6" />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                {claps}
+              </Typography>
             </IconButton>
           </div>
 
           <div style={{ display: "flex", gap: "16px" }}>
             <IconButton color="primary" onClick={handleShareClick}>
-              <FaShare style={{ color: "#6b7280" }} />
+              <FaShare color="#6b7280" />
             </IconButton>
             <IconButton color="primary" onClick={handleSavedClick}>
-              <FaBookmark style={{ color: "#6b7280" }} />
+              <FaBookmark color="#6b7280" />
             </IconButton>
           </div>
         </div>
 
-        <div style={{ marginBottom: "32px" }}>
-          {article.previewImage ? (
-            <img
-              src={article.previewImage}
-              alt="Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                borderRadius: "8px",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                marginBottom: "24px",
-              }}
-            />
-          ) : (
-            <div>No preview image available</div>
-          )}
-        </div>
+        {article.previewImage && (
+          <img
+            src={article.previewImage}
+            alt="Preview"
+            style={{
+              width: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              marginBottom: "24px",
+            }}
+          />
+        )}
 
         <div
           style={{
@@ -250,11 +210,7 @@ const BlogDetails = () => {
             overflow: article.isMemberOnly && !isMember ? "hidden" : "visible",
           }}
         >
-          <div
-            dangerouslySetInnerHTML={{
-              __html: article.content || "No content available",
-            }}
-          />
+          <div dangerouslySetInnerHTML={{ __html: article.content || "No content available" }} />
           {article.isMemberOnly && !isMember && (
             <div
               style={{
@@ -266,12 +222,12 @@ const BlogDetails = () => {
                 background: "linear-gradient(to bottom, transparent, white)",
                 textAlign: "center",
               }}
-            ></div>
+            />
           )}
         </div>
 
         {article.isMemberOnly && !isMember && <SubscriptionPlans />}
-        <CommentSection />
+        <CommentSection blogId={id}/>
       </div>
     </section>
   );

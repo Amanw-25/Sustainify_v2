@@ -269,16 +269,16 @@ const AddProduct = () => {
         {loading ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} sx={{borderRadius: 3}}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Images</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Stock</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Images</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Name</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Price</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Stock</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Category</TableCell>
+                  <TableCell sx={{backgroundColor: "#3B82F6" ,color:"white"}}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -291,6 +291,7 @@ const AddProduct = () => {
                             key={index}
                             src={image.url}
                             alt={`${product.name}-${index}`}
+
                             style={{
                               width: 50,
                               height: 50,

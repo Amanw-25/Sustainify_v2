@@ -92,7 +92,6 @@ const EventData = () => {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: "center",
             gap: 2,
             mt: 2,
           }}

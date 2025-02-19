@@ -115,7 +115,7 @@ const SavedBlogs = () => {
     }
   };
 
-  const handleRemoveSaved = async (savedBlogId, e) => {
+ const handleRemoveSaved = async (savedBlogId, e) => {
     e.stopPropagation();
     try {
       const response = await fetch(
@@ -133,9 +133,22 @@ const SavedBlogs = () => {
       }
 
       const data = await response.json();
+      
+      // Update the savedBlogs state
       setSavedBlogs((prevBlogs) =>
         prevBlogs.filter((blog) => blog._id !== savedBlogId)
       );
+
+      // Close the dialog if it's open
+      setOpenDialog(false);
+      
+      // Adjust current page if necessary
+      const remainingBlogs = savedBlogs.length - 1;
+      const newTotalPages = Math.ceil(remainingBlogs / itemsPerPage);
+      if (currentPage > newTotalPages) {
+        setCurrentPage(newTotalPages || 1);
+      }
+
       toast.success(data.message || "Blog removed from saved list");
     } catch (err) {
       toast.error("Failed to remove blog: " + err.message);
@@ -384,8 +397,7 @@ const SavedBlogs = () => {
                         display: "flex",
                         flexDirection: "column",
                       }}
-                      onClick={() => navigateToBlogPage(blog._id)}
-                    >
+                      >
                       {blog.previewImage && (
                         <CardMedia
                           component="img"

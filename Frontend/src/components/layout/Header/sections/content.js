@@ -11,28 +11,16 @@ import {
 
 export const navListMenuItems = [
   {
-    title: "Weather",
-    description: "Check the latest weather updates",
-    icon: FaCloudRain,
-    path: "/weather/:location",
-  },
-  {
     title: "Sustainable Practices",
     description: "Learn about sustainable practices",
     icon: FaLeaf,
     path: "/blog",
   },
   {
-    title: "Eco Community",
-    description: "Join our eco-friendly community",
+    title: "Eco Events",
+    description: "Join eco-friendly events",
     icon: FaUsers,
-    path: "/eco-community",
-  },
-  {
-    title: "Market Trends",
-    description: "Explore the latest market trends",
-    icon: FaChartLine,
-    path: "/market-trends",
+    path:'/event',
   },
   {
     title: "Carbon Footprint",
@@ -46,12 +34,7 @@ export const navListMenuItems = [
     icon: FaShoppingCart,
     path: "/eco-store",
   },
-  {
-    title: "Carbon Calculator",
-    description: "Calculate your carbon emissions",
-    icon: FaCalculator,
-    path: "/carbon-calculator",
-  },
+
 ];
 
 export const navLinks = [
