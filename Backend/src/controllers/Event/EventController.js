@@ -89,12 +89,13 @@ export const updateEvent = async (req, res) => {
   const { id } = req.params;
   const { name, description, date, location, time, type, host, agenda, prizes, keyTakeaways, specialNotes } = req.body;
   const userId = req.userId;
+  const userRole= req.role;
 
   try {
     const event = await EventDetails.findById(id);
     if (!event) throw new Error("Event not found");
 
-    if (event.organizer.toString() !== userId) {
+    if (event.organizer.toString() !== userId && userRole !== "admin") {
       throw new Error("Unauthorized to update this event");
     }
 
@@ -176,3 +177,4 @@ export const deleteEvent = async (req, res) => {
     res.status(404).json({ message: error.message, error: "Event not found" });
   }
 };
+

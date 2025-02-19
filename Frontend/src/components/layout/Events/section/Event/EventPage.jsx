@@ -350,7 +350,9 @@ const EventPage = () => {
                   borderRadius: '16px',
                   boxShadow: '0 10px 20px rgba(0,0,0,0.3)',
                   transform: 'rotate(2deg)',
+                  zIndex: -10,
                 }}
+
               />
             </Grid>
           </Grid>

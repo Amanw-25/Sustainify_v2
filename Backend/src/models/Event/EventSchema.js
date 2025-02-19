@@ -9,7 +9,7 @@ const eventDetailsSchema = new mongoose.Schema({
   location: { type: String, required: true },
   type: { type: String, required: true },
   organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  
+  host:{ type: String},
   agenda: [{ type: String }], 
   prizes: [{ type: String }], 
   keyTakeaways: [{ type: String }], 

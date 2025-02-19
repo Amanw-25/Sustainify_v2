@@ -16,48 +16,71 @@ import {
 const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
   const [formData, setFormData] = useState({
     name: "",
+    description: "",
     date: "",
     time: "",
     location: "",
     type: "offline",
-    description: "",
+    host: "",
     agenda: "",
     prizes: "",
-    giveaways: "",
     keyTakeaways: "",
     specialNotes: "",
+    image: null
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         ...initialData,
-        date: initialData.date ? initialData.date.split("T")[0] : "",
-        time: initialData.time || "",
-        agenda: initialData.agenda?.join(", ") || "",
-        prizes: initialData.prizes?.join(", ") || "",
-        giveaways: initialData.giveaways?.join(", ") || "",
-        keyTakeaways: initialData.keyTakeaways?.join(", ") || "",
+        date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : "",
+        agenda: Array.isArray(initialData.agenda) ? initialData.agenda.join(", ") : "",
+        prizes: Array.isArray(initialData.prizes) ? initialData.prizes.join(", ") : "",
+        keyTakeaways: Array.isArray(initialData.keyTakeaways) ? initialData.keyTakeaways.join(", ") : "",
       });
+      if (initialData.image) {
+        setImagePreview(initialData.image);
+      }
     }
   }, [initialData]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    
+    if (name === "image" && files && files[0]) {
+      setFormData(prev => ({ ...prev, image: files[0] }));
+      setImagePreview(URL.createObjectURL(files[0]));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const processedData = {
-      ...formData,
-      agenda: formData.agenda.split(",").map((item) => item.trim()).filter(Boolean),
-      prizes: formData.prizes.split(",").map((item) => item.trim()).filter(Boolean),
-      giveaways: formData.giveaways.split(",").map((item) => item.trim()).filter(Boolean),
-      keyTakeaways: formData.keyTakeaways.split(",").map((item) => item.trim()).filter(Boolean),
+    
+    const formDataToSubmit = new FormData();
+    
+    // Convert comma-separated strings to arrays and add to FormData
+    const arrayFields = {
+      agenda: formData.agenda.split(",").map(item => item.trim()).filter(Boolean),
+      prizes: formData.prizes.split(",").map(item => item.trim()).filter(Boolean),
+      keyTakeaways: formData.keyTakeaways.split(",").map(item => item.trim()).filter(Boolean)
     };
 
-    onSubmit(processedData);
+    // Add all form fields to FormData
+    Object.keys(formData).forEach(key => {
+      if (key in arrayFields) {
+        formDataToSubmit.append(key, JSON.stringify(arrayFields[key]));
+      } else if (key === "image" && formData.image) {
+        formDataToSubmit.append("files", formData.image);
+      } else {
+        formDataToSubmit.append(key, formData[key]);
+      }
+    });
+
+    onSubmit(formDataToSubmit);
   };
 
   return (
@@ -66,6 +89,29 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                type="file"
+                name="image"
+                onChange={handleChange}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ accept: "image/*" }}
+              />
+              {imagePreview && (
+                <img 
+                  src={imagePreview} 
+                  alt="Event preview" 
+                  style={{ 
+                    maxWidth: '100%', 
+                    maxHeight: '200px', 
+                    objectFit: 'contain',
+                    marginTop: '10px'
+                  }} 
+                />
+              )}
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 name="name"
@@ -76,8 +122,20 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 required
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
+              <TextField
+                name="host"
+                label="Event Host"
+                value={formData.host}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
                 <InputLabel>Event Type</InputLabel>
                 <Select
                   name="type"
@@ -90,6 +148,7 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 name="date"
@@ -102,6 +161,7 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 name="time"
@@ -114,7 +174,8 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12}>
+
+            <Grid item xs={12} sm={6}>
               <TextField
                 name="location"
                 label="Location"
@@ -124,6 +185,7 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 required
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 name="description"
@@ -136,6 +198,7 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 rows={3}
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 name="agenda"
@@ -145,26 +208,21 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 fullWidth
                 multiline
                 rows={2}
+                helperText="Enter items separated by commas"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+
+            <Grid item xs={12}>
               <TextField
                 name="prizes"
                 label="Prizes (comma-separated)"
                 value={formData.prizes}
                 onChange={handleChange}
                 fullWidth
+                helperText="Enter items separated by commas"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="giveaways"
-                label="Giveaways (comma-separated)"
-                value={formData.giveaways}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
+
             <Grid item xs={12}>
               <TextField
                 name="keyTakeaways"
@@ -174,8 +232,10 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
                 fullWidth
                 multiline
                 rows={2}
+                helperText="Enter items separated by commas"
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 name="specialNotes"
@@ -191,7 +251,7 @@ const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
+          <Button type="submit" variant="contained" color="primary">
             {isEditing ? "Update Event" : "Create Event"}
           </Button>
         </DialogActions>

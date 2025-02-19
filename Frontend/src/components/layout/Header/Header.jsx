@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useContext,
-  createElement,
-  useEffect,
-} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 import { BiMenu } from "react-icons/bi";
@@ -18,36 +12,56 @@ import {
   MenuItem,
   Typography,
 } from "@material-tailwind/react";
-import { Box, IconButton, useTheme } from "@mui/material";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import { ColorModeContext } from "../../../theme";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { createElement } from "react";
 import { navListMenuItems, navLinks } from "./sections/content";
 import { BASE_URL } from "../../../config";
 
 const Header = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const colorMode = useContext(ColorModeContext);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const menuRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Handle window resize
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
-        setMenuOpen(false);
+    const handleStorageChange = () => {
+      const currentToken = localStorage.getItem("token");
+      setToken(currentToken);
+      
+      if (!currentToken) {
+        setProfilePhoto(null);
       }
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check for token changes in this tab
+    const checkToken = setInterval(() => {
+      const currentToken = localStorage.getItem("token");
+      if (currentToken !== token) {
+        setToken(currentToken);
+        if (!currentToken) {
+          setProfilePhoto(null);
+        }
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(checkToken);
+    };
+  }, [token]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMenuOpen(false);
+    }
+  }, [isMobile]);
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
@@ -74,7 +88,6 @@ const Header = () => {
         });
 
         if (!res.ok) {
-          // If token is invalid or expired, clean up
           if (res.status === 401) {
             localStorage.removeItem("token");
             setToken(null);
@@ -84,7 +97,6 @@ const Header = () => {
         }
 
         const data = await res.json();
-        // Set profile photo if it exists, otherwise keep null to use default
         if (data.user && data.user.profilePhoto) {
           setProfilePhoto(data.user.profilePhoto);
         } else {
@@ -170,7 +182,7 @@ const Header = () => {
 
   return (
     <header className="header sticky top-0 z-50 w-full bg-white shadow-md">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 py-2 md:py-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -239,16 +251,6 @@ const Header = () => {
 
           {/* User Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Box display="flex">
-              <IconButton onClick={colorMode.toggleColorMode} className="p-2">
-                {theme.palette.mode === "dark" ? (
-                  <DarkModeOutlinedIcon className="text-black h-5 w-5" />
-                ) : (
-                  <LightModeOutlinedIcon className="text-black h-5 w-5" />
-                )}
-              </IconButton>
-            </Box>
-
             {/* Conditionally render login button or profile photo */}
             {renderUserAction()}
 
@@ -267,7 +269,7 @@ const Header = () => {
       {/* Mobile Navigation */}
       <div
         ref={menuRef}
-        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-lg z-[60] transform ${
+        className={`fixed top-0 left-0 h-full w-[280px] bg-white shadow-lg z-[9999] transform ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 overflow-y-auto`}
       >
@@ -310,17 +312,17 @@ const Header = () => {
                 {link.dropdown ? (
                   <div>
                     <button
-                      onClick={() => setIsMenuOpen(!isMenuOpen)}
-                      className="text-gray-800 text-[16px] font-[600] flex items-center gap-2"
+                      onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
+                      className="text-gray-800 text-[16px] font-[600] flex items-center gap-2 w-full"
                     >
                       {link.display}
                       <FaAngleDown
                         className={`h-4 w-4 transition-transform ${
-                          isMenuOpen ? "rotate-180" : ""
+                          mobileDropdownOpen ? "rotate-180" : ""
                         }`}
                       />
                     </button>
-                    {isMenuOpen && (
+                    {mobileDropdownOpen && (
                       <ul className="pl-4 mt-2 space-y-2">
                         {navListMenuItems.map((item, index) => (
                           <li key={index}>
@@ -370,7 +372,7 @@ const Header = () => {
       {/* Overlay for mobile menu */}
       {menuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
           onClick={toggleMenu}
         />
       )}
