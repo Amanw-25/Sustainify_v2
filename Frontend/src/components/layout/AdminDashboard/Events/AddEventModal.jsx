@@ -4,258 +4,566 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
+  TextField,
   Grid,
+  Typography,
+  Box,
+  InputAdornment,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Select,
+  FormHelperText,
+  IconButton,
+  Chip,
+  Paper,
 } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+
+const eventTypes = [
+  "Offline",
+  "Online"
+];
 
 const AddEventModal = ({ open, onClose, onSubmit, initialData, isEditing }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    date: "",
+    date: null,
     time: "",
     location: "",
-    type: "offline",
+    type: "",
     host: "",
+    agenda: [],
+    prizes: [],
+    keyTakeaways: [],
+    specialNotes: "",
+  });
+
+  const [newItem, setNewItem] = useState({
     agenda: "",
     prizes: "",
     keyTakeaways: "",
-    specialNotes: "",
-    image: null
   });
 
-  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
+    if (isEditing && initialData) {
+      const dateObj = initialData.date ? new Date(initialData.date) : null;
+
       setFormData({
-        ...initialData,
-        date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : "",
-        agenda: Array.isArray(initialData.agenda) ? initialData.agenda.join(", ") : "",
-        prizes: Array.isArray(initialData.prizes) ? initialData.prizes.join(", ") : "",
-        keyTakeaways: Array.isArray(initialData.keyTakeaways) ? initialData.keyTakeaways.join(", ") : "",
+        name: initialData.name || "",
+        description: initialData.description || "",
+        date: dateObj,
+        time: initialData.time || "",
+        location: initialData.location || "",
+        type: initialData.type || "",
+        host: initialData.host || "",
+        agenda: initialData.agenda || [],
+        prizes: initialData.prizes || [],
+        keyTakeaways: initialData.keyTakeaways || [],
+        specialNotes: initialData.specialNotes || "",
       });
+
       if (initialData.image) {
-        setImagePreview(initialData.image);
+        setPreviewImages(Array.isArray(initialData.image) ? initialData.image : [initialData.image]);
       }
     }
-  }, [initialData]);
+  }, [isEditing, initialData]);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    
-    if (name === "image" && files && files[0]) {
-      setFormData(prev => ({ ...prev, image: files[0] }));
-      setImagePreview(URL.createObjectURL(files[0]));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: null });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, date });
+    if (errors.date) {
+      setErrors({ ...errors, date: null });
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length > 0) {
+      setSelectedFiles(files);
+
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+
+      previewImages.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+
+      setPreviewImages(newPreviews);
+    }
+  };
+
+  const handleItemChange = (category, value) => {
+    setNewItem({ ...newItem, [category]: value });
+  };
+
+  const addItem = (category) => {
+    if (newItem[category].trim()) {
+      setFormData({
+        ...formData,
+        [category]: [...formData[category], newItem[category].trim()],
+      });
+      setNewItem({ ...newItem, [category]: "" });
+    }
+  };
+
+  const removeItem = (category, index) => {
+    const updatedItems = [...formData[category]];
+    updatedItems.splice(index, 1);
+    setFormData({ ...formData, [category]: updatedItems });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.date) newErrors.date = "Date is required";
+    if (!formData.time.trim()) newErrors.time = "Time is required";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.type.trim()) newErrors.type = "Event type is required";
+    if (!formData.host.trim()) newErrors.host = "Host is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const formDataToSubmit = new FormData();
-    
-    // Convert comma-separated strings to arrays and add to FormData
-    const arrayFields = {
-      agenda: formData.agenda.split(",").map(item => item.trim()).filter(Boolean),
-      prizes: formData.prizes.split(",").map(item => item.trim()).filter(Boolean),
-      keyTakeaways: formData.keyTakeaways.split(",").map(item => item.trim()).filter(Boolean)
-    };
 
-    // Add all form fields to FormData
-    Object.keys(formData).forEach(key => {
-      if (key in arrayFields) {
-        formDataToSubmit.append(key, JSON.stringify(arrayFields[key]));
-      } else if (key === "image" && formData.image) {
-        formDataToSubmit.append("files", formData.image);
-      } else {
-        formDataToSubmit.append(key, formData[key]);
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const submitFormData = new FormData();
+
+      Object.keys(formData).forEach(key => {
+        if (key === 'date' && formData[key]) {
+          const dateObj = new Date(formData[key]);
+          const formattedDate = dateObj.toISOString().split('T')[0];
+          submitFormData.append(key, formattedDate);
+        } else if (Array.isArray(formData[key])) {
+          submitFormData.append(key, JSON.stringify(formData[key]));
+        } else if (formData[key] !== null && formData[key] !== undefined) {
+          submitFormData.append(key, formData[key]);
+        }
+      });
+
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach(file => {
+          submitFormData.append("image", file);
+        });
       }
-    });
 
-    onSubmit(formDataToSubmit);
+
+      await onSubmit(submitFormData);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      previewImages.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [previewImages]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{isEditing ? "Edit Event" : "Add New Event"}</DialogTitle>
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
-          <Grid container spacing={2}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{ sx: { borderRadius: 2 } }}
+    >
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h5" fontWeight="bold" color="primary">
+          {isEditing ? "Edit Event" : "Add New Event"}
+        </Typography>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={3}>
+            {/* Basic Info Section */}
             <Grid item xs={12}>
-              <TextField
-                type="file"
-                name="image"
-                onChange={handleChange}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ accept: "image/*" }}
-              />
-              {imagePreview && (
-                <img 
-                  src={imagePreview} 
-                  alt="Event preview" 
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '200px', 
-                    objectFit: 'contain',
-                    marginTop: '10px'
-                  }} 
-                />
-              )}
+              <Typography variant="h6" color="textSecondary" gutterBottom>
+                Basic Information
+              </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 name="name"
                 label="Event Name"
+                fullWidth
                 value={formData.name}
-                onChange={handleChange}
-                fullWidth
+                onChange={handleInputChange}
+                error={!!errors.name}
+                helperText={errors.name}
                 required
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="host"
-                label="Event Host"
-                value={formData.host}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth error={!!errors.type} required>
                 <InputLabel>Event Type</InputLabel>
                 <Select
                   name="type"
                   value={formData.type}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   label="Event Type"
                 >
-                  <MenuItem value="offline">Offline</MenuItem>
-                  <MenuItem value="online">Online</MenuItem>
+                  {eventTypes.map(type => (
+                    <MenuItem key={type} value={type}>{type}</MenuItem>
+                  ))}
                 </Select>
+                {errors.type && <FormHelperText>{errors.type}</FormHelperText>}
               </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="date"
-                label="Date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="time"
-                label="Time"
-                type="time"
-                value={formData.time}
-                onChange={handleChange}
-                fullWidth
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="location"
-                label="Location"
-                value={formData.location}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
             </Grid>
 
             <Grid item xs={12}>
               <TextField
                 name="description"
                 label="Description"
+                multiline
+                rows={4}
+                fullWidth
                 value={formData.description}
-                onChange={handleChange}
-                fullWidth
+                onChange={handleInputChange}
+                error={!!errors.description}
+                helperText={errors.description}
                 required
-                multiline
-                rows={3}
+              />
+            </Grid>
+
+            {/* Date, Time & Location */}
+            <Grid item xs={12} md={4}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Event Date"
+                  value={formData.date}
+                  onChange={handleDateChange}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      required
+                      error={!!errors.date}
+                      helperText={errors.date}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                name="time"
+                label="Event Time"
+                placeholder="e.g., 10:00 AM - 2:00 PM"
+                fullWidth
+                value={formData.time}
+                onChange={handleInputChange}
+                error={!!errors.time}
+                helperText={errors.time}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                name="location"
+                label="Location"
+                fullWidth
+                value={formData.location}
+                onChange={handleInputChange}
+                error={!!errors.location}
+                helperText={errors.location}
+                required
               />
             </Grid>
 
             <Grid item xs={12}>
               <TextField
-                name="agenda"
-                label="Agenda (comma-separated)"
-                value={formData.agenda}
-                onChange={handleChange}
+                name="host"
+                label="Host/Organizer"
                 fullWidth
-                multiline
-                rows={2}
-                helperText="Enter items separated by commas"
+                value={formData.host}
+                onChange={handleInputChange}
+                error={!!errors.host}
+                helperText={errors.host}
+                required
               />
             </Grid>
 
+            {/* Image Upload */}
             <Grid item xs={12}>
-              <TextField
-                name="prizes"
-                label="Prizes (comma-separated)"
-                value={formData.prizes}
-                onChange={handleChange}
-                fullWidth
-                helperText="Enter items separated by commas"
+              <Typography variant="h6" color="textSecondary" gutterBottom>
+                Event Images
+              </Typography>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={handleFileChange}
               />
+              <label htmlFor="raised-button-file">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  startIcon={<AddIcon />}
+                >
+                  {isEditing ? "Change Images" : "Upload Images"}
+                </Button>
+              </label>
+
+              {/* Image Preview */}
+              {previewImages.length > 0 && (
+                <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {previewImages.map((preview, idx) => (
+                    <Box
+                      key={idx}
+                      component="img"
+                      src={preview}
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        objectFit: 'cover',
+                        borderRadius: 1,
+                        border: '1px solid #eee'
+                      }}
+                      alt={`Preview ${idx}`}
+                    />
+                  ))}
+                </Box>
+              )}
+
+              {isEditing && selectedFiles.length === 0 && (
+                <FormHelperText>
+                  {previewImages.length > 0
+                    ? "Original images will be kept if no new ones are selected"
+                    : "Upload new images or keep the original ones"}
+                </FormHelperText>
+              )}
             </Grid>
 
+            {/* Additional Info Sections */}
             <Grid item xs={12}>
-              <TextField
-                name="keyTakeaways"
-                label="Key Takeaways (comma-separated)"
-                value={formData.keyTakeaways}
-                onChange={handleChange}
-                fullWidth
-                multiline
-                rows={2}
-                helperText="Enter items separated by commas"
-              />
+              <Typography variant="h6" color="textSecondary" gutterBottom>
+                Additional Information
+              </Typography>
             </Grid>
 
+            {/* Agenda Items */}
+            <Grid item xs={12} md={4}>
+              <Typography variant="subtitle1" gutterBottom>
+                Agenda Items
+              </Typography>
+              <Box sx={{ display: 'flex', mb: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Add agenda item"
+                  value={newItem.agenda}
+                  onChange={(e) => handleItemChange('agenda', e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addItem('agenda')}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ ml: 1 }}
+                  onClick={() => addItem('agenda')}
+                >
+                  Add
+                </Button>
+              </Box>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1,
+                  minHeight: '100px',
+                  maxHeight: '150px',
+                  overflowY: 'auto'
+                }}
+              >
+                {formData.agenda.length > 0 ? (
+                  formData.agenda.map((item, idx) => (
+                    <Chip
+                      key={idx}
+                      label={item}
+                      onDelete={() => removeItem('agenda', idx)}
+                      sx={{ m: 0.5 }}
+                    />
+                  ))
+                ) : (
+                  <Typography color="text.secondary" align="center" sx={{ pt: 2 }}>
+                    No agenda items added
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            {/* Prizes */}
+            <Grid item xs={12} md={4}>
+              <Typography variant="subtitle1" gutterBottom>
+                Prizes
+              </Typography>
+              <Box sx={{ display: 'flex', mb: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Add prize"
+                  value={newItem.prizes}
+                  onChange={(e) => handleItemChange('prizes', e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addItem('prizes')}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ ml: 1 }}
+                  onClick={() => addItem('prizes')}
+                >
+                  Add
+                </Button>
+              </Box>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1,
+                  minHeight: '100px',
+                  maxHeight: '150px',
+                  overflowY: 'auto'
+                }}
+              >
+                {formData.prizes.length > 0 ? (
+                  formData.prizes.map((item, idx) => (
+                    <Chip
+                      key={idx}
+                      label={item}
+                      onDelete={() => removeItem('prizes', idx)}
+                      sx={{ m: 0.5 }}
+                    />
+                  ))
+                ) : (
+                  <Typography color="text.secondary" align="center" sx={{ pt: 2 }}>
+                    No prizes added
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            {/* Key Takeaways */}
+            <Grid item xs={12} md={4}>
+              <Typography variant="subtitle1" gutterBottom>
+                Key Takeaways
+              </Typography>
+              <Box sx={{ display: 'flex', mb: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="Add key takeaway"
+                  value={newItem.keyTakeaways}
+                  onChange={(e) => handleItemChange('keyTakeaways', e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addItem('keyTakeaways')}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ ml: 1 }}
+                  onClick={() => addItem('keyTakeaways')}
+                >
+                  Add
+                </Button>
+              </Box>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1,
+                  minHeight: '100px',
+                  maxHeight: '150px',
+                  overflowY: 'auto'
+                }}
+              >
+                {formData.keyTakeaways.length > 0 ? (
+                  formData.keyTakeaways.map((item, idx) => (
+                    <Chip
+                      key={idx}
+                      label={item}
+                      onDelete={() => removeItem('keyTakeaways', idx)}
+                      sx={{ m: 0.5 }}
+                    />
+                  ))
+                ) : (
+                  <Typography color="text.secondary" align="center" sx={{ pt: 2 }}>
+                    No key takeaways added
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            {/* Special Notes */}
             <Grid item xs={12}>
               <TextField
                 name="specialNotes"
                 label="Special Notes"
-                value={formData.specialNotes}
-                onChange={handleChange}
-                fullWidth
                 multiline
-                rows={2}
+                rows={3}
+                fullWidth
+                value={formData.specialNotes}
+                onChange={handleInputChange}
+                placeholder="Any additional information about the event"
               />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained" color="primary">
-            {isEditing ? "Update Event" : "Create Event"}
-          </Button>
-        </DialogActions>
-      </form>
+        </form>
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={onClose} variant="outlined" disabled={isSubmitting}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Saving..." : isEditing ? "Update Event" : "Create Event"}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

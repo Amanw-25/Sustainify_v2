@@ -30,8 +30,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import StarIcon from "@mui/icons-material/Star";
 import InfoIcon from "@mui/icons-material/Info";
 import ShareIcon from "@mui/icons-material/Share";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
@@ -49,6 +48,7 @@ const EventDetails = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -57,8 +57,15 @@ const EventDetails = () => {
         const data = await response.json();
 
         if (response.ok) {
+          const parsedEvent = {
+            ...data.event,
+            agenda: parseArrayField(data.event.agenda),
+            prizes: parseArrayField(data.event.prizes),
+            keyTakeaways: parseArrayField(data.event.keyTakeaways)
+          };
+
           setTimeout(() => {
-            setEvent(data.event);
+            setEvent(parsedEvent);
             setLoading(false);
           }, 800);
         } else {
@@ -69,6 +76,17 @@ const EventDetails = () => {
         console.error("Error fetching event:", err);
         toast.error("An error occurred while loading event details");
         setLoading(false);
+      }
+    };
+
+    const parseArrayField = (field) => {
+      if (!field) return [];
+      if (Array.isArray(field)) return field;
+      try {
+        return JSON.parse(field);
+      } catch (e) {
+        console.error("Error parsing field:", e);
+        return Array.isArray(field) ? field : [field];
       }
     };
 
@@ -116,7 +134,7 @@ const EventDetails = () => {
   };
 
   const handleGoBack = () => {
-    window.history.back();
+    navigate('/event')
   };
 
   const toggleLike = () => {
@@ -275,10 +293,9 @@ const EventDetails = () => {
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url(${
-              event.image ||
+            backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url(${event.image ||
               "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&auto=format&fit=crop"
-            })`,
+              })`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             zIndex: 0,
@@ -374,8 +391,8 @@ const EventDetails = () => {
                   {isPastEvent
                     ? "EVENT"
                     : daysRemaining === 1
-                    ? "DAY LEFT"
-                    : "DAYS LEFT"}
+                      ? "DAY LEFT"
+                      : "DAYS LEFT"}
                 </Typography>
               </Paper>
 
@@ -432,23 +449,6 @@ const EventDetails = () => {
                     }}
                   />
 
-                  <Chip
-                    icon={
-                      <VisibilityIcon
-                        sx={{ fontSize: "0.875rem !important" }}
-                      />
-                    }
-                    label={`${viewCount} views`}
-                    variant="outlined"
-                    sx={{
-                      borderRadius: 6,
-                      color: "white",
-                      borderColor: "rgba(255,255,255,0.5)",
-                      "& .MuiChip-icon": { color: "white" },
-                      bgcolor: "rgba(255,255,255,0.1)",
-                      height: 32,
-                    }}
-                  />
                 </Box>
               </Box>
             </Box>

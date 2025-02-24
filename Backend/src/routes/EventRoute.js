@@ -7,7 +7,7 @@ import { authenticate, restrict } from '../middlewares/verifyToken.js';
 
 const EventRoute = express.Router();
 
-EventRoute.post('/addEvent', upload.array("image"),authenticate, addEvent);
+EventRoute.post('/addEvent', upload.array("image",1),authenticate, addEvent);
 EventRoute.get('/getAllEvents', getAllEvents);
 EventRoute.get('/getEventById/:id', getEventById);
 EventRoute.put('/updateEvent/:id', upload.array("image"), authenticate, updateEvent);

@@ -21,6 +21,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../Global/Sidebar";
 import EventModal from "./AddEventModal";
+import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../../config.js";
 
 const ManageEvent = () => {
@@ -32,6 +33,7 @@ const ManageEvent = () => {
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   const isMobile = useMediaQuery("(max-width: 1024px)");
 
@@ -41,49 +43,103 @@ const ManageEvent = () => {
       const response = await fetch(`${BASE_URL}/event/getAllEvents`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Failed to fetch events: ${text}`);
+      }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Failed to fetch events");
-      setEvents(data.events);
+      setEvents(data.events || []);
     } catch (error) {
+      console.error("Fetch events error:", error);
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddEvent = async (newEvent) => {
+  const handleAddEvent = async (formData) => {
     try {
+      const requiredFields = ['name', 'description', 'date', 'location', 'time', 'type', 'host'];
+      for (const field of requiredFields) {
+        if (!formData.has(field) || !formData.get(field)) {
+          throw new Error(`Missing required field: ${field}`);
+        }
+      }
+
       const response = await fetch(`${BASE_URL}/event/addEvent`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-        body: newEvent,
+        body: formData,
       });
-      if (response.ok) handleSuccess();
-      else {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to add event");
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Failed to add event: ${text}`);
       }
+
+      const data = await response.json();
+      handleSuccess();
     } catch (error) {
+      console.error("Add event error:", error);
       setError(error.message);
     }
   };
 
-  const handleEditEvent = async (updatedEvent) => {
+  const handleEditEvent = async (formData) => {
     try {
+      if (formData.has('image')) {
+        const imageFiles = formData.getAll('image');
+        const hasValidFiles = imageFiles.some(file =>
+          file instanceof File && file.size > 0
+        );
+
+        if (!hasValidFiles) {
+          formData.delete('image');
+        }
+      }
+
+      const requiredFields = ['name', 'description', 'date', 'location', 'time', 'type', 'host'];
+      let missingFields = [];
+
+      for (const field of requiredFields) {
+        if (!formData.has(field) || !formData.get(field)) {
+          missingFields.push(field);
+        }
+      }
+
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+
       const response = await fetch(
         `${BASE_URL}/event/updateEvent/${selectedEvent._id}`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
-          body: updatedEvent,
+          body: formData,
         }
       );
-      if (response.ok) handleSuccess();
-      else {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to update event");
+
+      if (!response.ok) {
+        let errorText;
+        try {
+          errorText = await response.text();
+        } catch (e) {
+          errorText = "Unable to get error details";
+        }
+        console.log("Raw error response:", errorText);
+        throw new Error(`Failed to update event: ${errorText}`);
       }
+
+      try {
+        const data = await response.json();
+      } catch (e) {
+        console.log("Non-JSON response after successful update");
+      }
+
+      handleSuccess();
     } catch (error) {
+      console.error("Edit event error:", error);
       setError(error.message);
     }
   };
@@ -96,11 +152,12 @@ const ManageEvent = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to delete event");
+        const text = await response.text();
+        throw new Error(`Failed to delete event: ${text}`);
       }
       fetchEvents();
     } catch (error) {
+      console.error("Delete event error:", error);
       setError(error.message);
     }
   };
@@ -204,7 +261,7 @@ const ManageEvent = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  {["Event Name", "Date", "Time", "Type", "Actions"].map((head) => (
+                  {["Event Name", "Date", "Time", "Type", "Host", "Location", "Actions"].map((head) => (
                     <TableCell
                       key={head}
                       sx={{
@@ -226,12 +283,14 @@ const ManageEvent = () => {
                 {filteredEvents.map((event) => (
                   <TableRow key={event._id} hover>
                     <TableCell>{event.name}</TableCell>
-                    <TableCell>{event.date.split('T')[0]}</TableCell>
+                    <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
                     <TableCell>{event.time}</TableCell>
                     <TableCell>{event.type}</TableCell>
+                    <TableCell>{event.host}</TableCell>
+                    <TableCell>{event.location}</TableCell>
                     <TableCell>
-                      <Box sx={{ 
-                        display: "flex", 
+                      <Box sx={{
+                        display: "flex",
                         gap: 1,
                         flexDirection: isMobile ? "column" : "row"
                       }}>
@@ -265,9 +324,9 @@ const ManageEvent = () => {
         <Button
           variant="contained"
           color="success"
-          sx={{ 
-            position: "fixed", 
-            bottom: isMobile ? 16 : 20, 
+          sx={{
+            position: "fixed",
+            bottom: isMobile ? 16 : 20,
             right: isMobile ? 16 : 20,
             boxShadow: 3
           }}

@@ -224,7 +224,7 @@ const Header = () => {
                           </div>
                         </Typography>
                       </MenuHandler>
-                      <MenuList className="max-w-screen-xl bg-white rounded-xl shadow-lg">
+                      <MenuList className="max-w-screen-xl bg-white rounded-xl shadow-lg z-[999999]">
                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-2 outline-none">
                           {renderDropdownItems}
                         </ul>
