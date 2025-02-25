@@ -1,6 +1,7 @@
 import { CarbonFootprint } from "../../models/index.js";
 import { User } from "../../models/index.js";
 import { spawn } from "child_process";
+import path from "path";
 
 const validateFields = (fields, requiredFields) => {
   for (const field of requiredFields) {
@@ -155,8 +156,8 @@ export const chatWithMistralAI = async (req, res) => {
     `;
 
     let responseData = "";
-
-    const pythonProcess = spawn("python3", ["app.py", messageContent]);
+    const pythonScript = path.join(__dirname, "..", "app.py");
+    const pythonProcess = spawn("python3", [pythonScript, messageContent]);
 
     pythonProcess.stdout.on("data", (data) => {
       responseData += data.toString();
@@ -165,6 +166,7 @@ export const chatWithMistralAI = async (req, res) => {
     let errorOutput = "";
     pythonProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
+      console.error(`Python stderr: ${data}`); // Add this for extra visibility
     });
 
     await new Promise((resolve, reject) => {
