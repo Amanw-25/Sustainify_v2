@@ -2,6 +2,13 @@ import { CarbonFootprint } from "../../models/index.js";
 import { User } from "../../models/index.js";
 import { spawn } from "child_process";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const pythonScriptPath = path.join(__dirname, "..", "..", "..", "app.py");
 
 const validateFields = (fields, requiredFields) => {
   for (const field of requiredFields) {
@@ -156,8 +163,7 @@ export const chatWithMistralAI = async (req, res) => {
     `;
 
     let responseData = "";
-    const pythonScript = path.join(__dirname, "..", "app.py");
-    const pythonProcess = spawn("python3", [pythonScript, messageContent]);
+    const pythonProcess = spawn("python3", [pythonScriptPath, messageContent]);
 
     pythonProcess.stdout.on("data", (data) => {
       responseData += data.toString();
@@ -166,13 +172,13 @@ export const chatWithMistralAI = async (req, res) => {
     let errorOutput = "";
     pythonProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
-      console.error(`Python stderr: ${data}`); // Add this for extra visibility
+      console.error(`Python stderr: ${data}`); 
     });
 
     await new Promise((resolve, reject) => {
       pythonProcess.on("close", (code) => {
         if (code !== 0) {
-          console.error(`Python error output: ${errorOutput}`); // Log full error
+          console.error(`Python error output: ${errorOutput}`);
           reject(new Error(`Python script failed with code ${code}`));
           return;
         }
