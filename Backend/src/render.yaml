@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sustainify-v2
+    env: node
+    buildCommand: npm install
+    startCommand: node Backend/src/index.js 
+    nativeEnvironments:
+      - type: python
+        version: "3.12" 
