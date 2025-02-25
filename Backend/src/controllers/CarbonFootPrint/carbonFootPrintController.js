@@ -170,6 +170,7 @@ export const chatWithMistralAI = async (req, res) => {
     await new Promise((resolve, reject) => {
       pythonProcess.on("close", (code) => {
         if (code !== 0) {
+          console.error(`Python error output: ${errorOutput}`); // Log full error
           reject(new Error(`Python script failed with code ${code}`));
           return;
         }
