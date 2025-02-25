@@ -32,51 +32,56 @@ export const quickLinks01 = [
   },
 
   {
-    path: "/",
-    display: "About Us",
+    path: "/about",
+    display: "About Sustainify",
   },
 
   {
-    path: "/services",
-    display: "Services",
+    path: "/shop",
+    display: "Shop Sustainable",
   },
 
   {
-    path: "/",
-    display: "Blog",
+    path: "/blog",
+    display: "Eco Blog",
   },
 ];
 
 export const quickLinks02 = [
   {
-    path: "/find-a-doctore",
-    display: "Find a Doctor",
+    path: "/categories",
+    display: "Browse Categories",
   },
 
   {
-    path: "/",
-    display: "Request an Appointment",
+    path: "/impact",
+    display: "Our Impact",
   },
 
   {
-    path: "/",
-    display: "Find a Location",
+    path: "/recycling",
+    display: "Recycling Guide",
   },
 
   {
-    path: "/",
-    display: "Get a Opinion",
+    path: "/community",
+    display: "Join Community",
   },
 ];
 
 export const quickLinks03 = [
   {
-    path: "/",
-    display: "Donate",
+    path: "/donate",
+    display: "Support Sustainability",
   },
 
   {
     path: "/contact",
     display: "Contact Us",
+  },
+
+  {
+    path: "/faq",
+    display: "FAQs",
   },
 ];

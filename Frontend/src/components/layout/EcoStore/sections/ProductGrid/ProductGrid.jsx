@@ -56,7 +56,7 @@ const ProductGrid = () => {
     <Box sx={{ position: "relative" }}>
       <Typography
         variant="h3"
-        sx={{ mb: 3, textAlign: "center", fontWeight: "bold", color: "#004d40" }}
+        sx={{ mb: 3, textAlign: "center", fontWeight: "bold", color: "#004d40" , mt: 5}}
       >
         Featured Eco-Friendly Products
       </Typography>

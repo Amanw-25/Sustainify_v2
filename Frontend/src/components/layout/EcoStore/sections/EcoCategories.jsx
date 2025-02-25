@@ -10,7 +10,7 @@ import Loading from "../../../../Loader/Loading.jsx";
 
 const EcoCategories = () => {
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,7 +31,7 @@ const EcoCategories = () => {
       } catch (error) {
         console.log(error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -39,9 +39,11 @@ const EcoCategories = () => {
   }, []);
 
   if (loading) {
-    return <Loading />; 
+    return <Loading />;
   }
 
+  // Use a single common sustainability image for all categories
+  const commonImageUrl = "https://plus.unsplash.com/premium_photo-1677706393867-66c3b1396dbb?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   return (
     <Box sx={{ textAlign: "center", my: 4 }}>
       <Typography
@@ -70,7 +72,7 @@ const EcoCategories = () => {
           <SwiperSlide key={index}>
             <Box sx={{ textAlign: "center", p: 2, ml: 4 }}>
               <img
-                src="https://images.unsplash.com/photo-1601979031925-424e53b6caaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                src={commonImageUrl}
                 alt={category}
                 style={{
                   width: "70px",
