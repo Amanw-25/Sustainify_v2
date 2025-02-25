@@ -8,7 +8,7 @@ import appconfig from "./config/appConfig.js";
 
     app.listen(appconfig.PORT, () => {
       console.log(
-        `Server started at http://localhost:${appconfig.PORT || 3030}/`
+        `Server started at https://sustainify-v2.onrender.com/`
       );
     });
   } catch (error) {
