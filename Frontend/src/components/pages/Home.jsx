@@ -9,9 +9,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import About from "../layout/About/About";
 import Service from "../layout/Service/Service";
 import Testimonial from "../layout/Testimonal/Testimonal";
-// import About from "../components/layout/About/About";
-// import Testimonial from "../components/layout/Testimonal/Testimonal";
-// import Service from "../components/layout/Service/Service";
+
 
 const Home = () => {
   return (

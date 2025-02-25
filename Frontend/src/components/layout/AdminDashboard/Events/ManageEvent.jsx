@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../Global/Sidebar";
-import EventModal from "./AddEventModal";
+import EventModal from "./AddEventModal/AddEventModal.jsx";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../../config.js";
 

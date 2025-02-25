@@ -16,7 +16,6 @@ import {
   FaCalendarAlt, 
   FaMapMarkerAlt, 
   FaClock, 
-  FaUserTie,
   FaChevronRight,
   FaCheck
 } from "react-icons/fa";
