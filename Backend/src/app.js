@@ -1,7 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import appconfig from "./config/appConfig.js";
 
 // Import Routes
 import Authrouter from "./routes/authRoute.js";
@@ -16,6 +15,7 @@ import CheckoutRouter from "./routes/checkoutRoute.js";
 import CartRouter from "./routes/CartRoute.js";
 import Subscription from "./routes/SubscriptionRoute.js";
 import BadgeRouter from "./routes/badgeRoutes.js";
+import appconfig from "./config/appConfig.js";
 import testRouter from "./routes/badgeTestRoutes.js";
 import './config/cron.js';
 

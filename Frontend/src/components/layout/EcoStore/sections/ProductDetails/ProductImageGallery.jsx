@@ -35,15 +35,15 @@ export const ProductImages = ({
   };
 
   return (
-    <div className="md:col-span-2 flex gap-5">
-      <div className="flex flex-col gap-3">
+    <div className="flex flex-col md:flex-row md:col-span-2 md:gap-5 gap-3">
+      <div className="flex flex-row md:flex-col order-2 md:order-none gap-3 overflow-x-auto pb-2 md:pb-0">
         {images.slice(0, 3).map((image, index) => (
-          <div key={index} className="relative">
+          <div key={index} className="relative flex-shrink-0">
             <img
               src={image.url}
               alt={`Product thumbnail ${index + 1}`}
               onClick={() => setMainImage(image.url)}
-              className={`w-20 h-20 rounded-lg object-cover cursor-pointer transition-all duration-300 hover:opacity-90 
+              className={`w-16 h-16 md:w-10 md:h-10 rounded-lg object-cover cursor-pointer transition-all duration-300 hover:opacity-90 
                 ${mainImage === image.url ? "border-2 border-blue-600 shadow-lg" : "border border-gray-200"}`}
             />
             {mainImage === image.url && (
@@ -53,10 +53,11 @@ export const ProductImages = ({
         ))}
       </div>
 
-      <div className="relative">
+      {/* Main image container */}
+      <div className="relative order-1 md:order-none">
         <div
           ref={imageContainerRef}
-          className="relative w-80 h-80 overflow-hidden rounded-3xl"
+          className="relative w-full md:w-80 aspect-square md:h-80 overflow-hidden rounded-xl md:rounded-3xl"
           onMouseMove={handleImageZoom}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -83,7 +84,7 @@ export const ProductImages = ({
 
           {imageLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent" />
+              <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-4 border-blue-600 border-t-transparent" />
             </div>
           )}
         </div>

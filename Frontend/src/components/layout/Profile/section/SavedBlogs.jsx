@@ -66,6 +66,21 @@ const SavedBlogs = () => {
     fetchSavedBlogs();
   }, []);
 
+  useEffect(() => {
+    function handleResize() {
+      const newItemsPerPage = getItemsPerPage();
+      if (newItemsPerPage !== itemsPerPage) {
+        const newTotalPages = Math.ceil(savedBlogs.length / newItemsPerPage);
+        if (currentPage > newTotalPages) {
+          setCurrentPage(newTotalPages || 1);
+        }
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [savedBlogs, currentPage, itemsPerPage]);
+
   const fetchSavedBlogs = async () => {
     setLoading(true);
     try {
@@ -115,7 +130,7 @@ const SavedBlogs = () => {
     }
   };
 
- const handleRemoveSaved = async (savedBlogId, e) => {
+  const handleRemoveSaved = async (savedBlogId, e) => {
     e.stopPropagation();
     try {
       const response = await fetch(
@@ -134,15 +149,12 @@ const SavedBlogs = () => {
 
       const data = await response.json();
       
-      // Update the savedBlogs state
       setSavedBlogs((prevBlogs) =>
         prevBlogs.filter((blog) => blog._id !== savedBlogId)
       );
 
-      // Close the dialog if it's open
       setOpenDialog(false);
       
-      // Adjust current page if necessary
       const remainingBlogs = savedBlogs.length - 1;
       const newTotalPages = Math.ceil(remainingBlogs / itemsPerPage);
       if (currentPage > newTotalPages) {
@@ -164,7 +176,7 @@ const SavedBlogs = () => {
       .catch(() => toast.error("Failed to copy link"));
   };
 
-  const handlePageChange = (event, value) => {
+  const handlePageChange = (value) => {
     setCurrentPage(value);
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -173,13 +185,13 @@ const SavedBlogs = () => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      handlePageChange(currentPage + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      handlePageChange(currentPage - 1);
     }
   };
 
@@ -212,7 +224,6 @@ const SavedBlogs = () => {
     );
   };
 
-  // Get current page blogs
   const getCurrentPageBlogs = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -237,7 +248,7 @@ const SavedBlogs = () => {
   if (error) {
     return (
       <Container>
-        <Paper sx={{ p: 3, mt: 3, borderRadius: 2, boxShadow: 3 }}>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mt: 3, borderRadius: 2, boxShadow: 3 }}>
           <Typography variant="h6" color="error">
             {error}
           </Typography>
@@ -255,13 +266,15 @@ const SavedBlogs = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Paper sx={{ p: 4, borderRadius: 2, boxShadow: 3, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 2, mb: 4, px: { xs: 2, sm: 3, md: 4 } }}>
+      <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: 2, boxShadow: 3, mb: 4 }}>
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "flex-start", sm: "center" },
+            gap: 2,
             mb: 3,
           }}
         >
@@ -272,8 +285,11 @@ const SavedBlogs = () => {
             <Typography
               variant="h4"
               component="h1"
-              gutterBottom
-              sx={{ fontWeight: 600, m: 0 }}
+              sx={{ 
+                fontWeight: 600, 
+                m: 0,
+                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.25rem" } 
+              }}
             >
               My Saved Blogs
             </Typography>
@@ -282,7 +298,11 @@ const SavedBlogs = () => {
             variant="contained"
             startIcon={<MdRefresh />}
             onClick={fetchSavedBlogs}
-            sx={{ bgcolor: "#3f51b5", "&:hover": { bgcolor: "#303f9f" } }}
+            sx={{ 
+              bgcolor: "#3f51b5", 
+              "&:hover": { bgcolor: "#303f9f" },
+              alignSelf: { xs: "flex-end", sm: "auto" }
+            }}
           >
             Refresh
           </Button>
@@ -293,7 +313,7 @@ const SavedBlogs = () => {
         {savedBlogs.length === 0 ? (
           <Paper
             sx={{
-              p: 4,
+              p: { xs: 3, sm: 4 },
               textAlign: "center",
               borderRadius: 2,
               bgcolor: "#f5f5f5",
@@ -319,13 +339,14 @@ const SavedBlogs = () => {
           </Paper>
         ) : (
           <Box>
-            {/* Navigation controls */}
             <Box
               ref={scrollRef}
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: { xs: "flex-start", sm: "center" },
+                gap: 2,
                 mb: 2,
               }}
             >
@@ -335,10 +356,11 @@ const SavedBlogs = () => {
                 {savedBlogs.length} saved blogs
               </Typography>
 
-              <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box sx={{ display: "flex", alignItems: "center", alignSelf: { xs: "center", sm: "auto" } }}>
                 <IconButton
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
+                  size={isMobile ? "small" : "medium"}
                   sx={{
                     bgcolor: currentPage === 1 ? "#f5f5f5" : "#e3f2fd",
                     color: currentPage === 1 ? "#bdbdbd" : "#1976d2",
@@ -357,6 +379,7 @@ const SavedBlogs = () => {
                 <IconButton
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
+                  size={isMobile ? "small" : "medium"}
                   sx={{
                     bgcolor: currentPage === totalPages ? "#f5f5f5" : "#e3f2fd",
                     color: currentPage === totalPages ? "#bdbdbd" : "#1976d2",
@@ -368,8 +391,7 @@ const SavedBlogs = () => {
               </Box>
             </Box>
 
-            {/* Blog cards */}
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
               {getCurrentPageBlogs().map((savedBlog) => {
                 const blog = savedBlog.blogId;
                 const publishDate = blog.publishDate
@@ -377,12 +399,13 @@ const SavedBlogs = () => {
                   : null;
                 const isOldPost =
                   publishDate &&
-                  new Date() - publishDate > 90 * 24 * 60 * 60 * 1000; // older than 90 days
+                  new Date() - publishDate > 90 * 24 * 60 * 60 * 1000;
 
                 return (
                   <Grid item xs={12} md={isTablet ? 6 : 4} key={savedBlog._id}>
                     <Card
                       variant="outlined"
+                      onClick={() => handleViewDetails(savedBlog)}
                       sx={{
                         borderRadius: 2,
                         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
@@ -397,33 +420,31 @@ const SavedBlogs = () => {
                         display: "flex",
                         flexDirection: "column",
                       }}
-                      >
+                    >
                       {blog.previewImage && (
                         <CardMedia
                           component="img"
-                          height="160"
+                          height={isMobile ? "140" : "160"}
                           image={blog.previewImage}
                           alt={blog.title}
+                          sx={{ objectFit: "cover" }}
                         />
                       )}
 
-                      <CardContent sx={{ pt: 3, flexGrow: 1 }}>
-                        {blog.category && (
-                          <Box sx={{ mb: 2 }}>
-                            {getCategoryChip(blog.category)}
-                            {isOldPost && (
-                              <Chip
-                                label="Older Post"
-                                size="small"
-                                sx={{
-                                  ml: 1,
-                                  bgcolor: "#e0e0e0",
-                                  fontWeight: 500,
-                                }}
-                              />
-                            )}
-                          </Box>
-                        )}
+                      <CardContent sx={{ pt: 2, flexGrow: 1 }}>
+                        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                          {blog.category && getCategoryChip(blog.category)}
+                          {isOldPost && (
+                            <Chip
+                              label="Older Post"
+                              size="small"
+                              sx={{
+                                bgcolor: "#e0e0e0",
+                                fontWeight: 500,
+                              }}
+                            />
+                          )}
+                        </Box>
 
                         <Typography
                           variant="h6"
@@ -436,7 +457,8 @@ const SavedBlogs = () => {
                             WebkitBoxOrient: "vertical",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            height: 48,
+                            minHeight: { xs: "auto", sm: "48px" },
+                            fontSize: { xs: "1rem", sm: "1.25rem" }
                           }}
                         >
                           {blog.title || "Untitled Blog"}
@@ -451,6 +473,7 @@ const SavedBlogs = () => {
                             WebkitBoxOrient: "vertical",
                             overflow: "hidden",
                             mb: 2,
+                            minHeight: { xs: "auto", sm: "4.5em" }
                           }}
                         >
                           {blog.summary || "No summary available"}
@@ -478,7 +501,12 @@ const SavedBlogs = () => {
                       </CardContent>
 
                       <CardActions
-                        sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
+                        sx={{ 
+                          justifyContent: "space-between", 
+                          px: { xs: 1, sm: 2 }, 
+                          pb: { xs: 1, sm: 2 },
+                          pt: 0 
+                        }}
                       >
                         <Button
                           size="small"
@@ -503,11 +531,7 @@ const SavedBlogs = () => {
 
                           <IconButton
                             size="small"
-                            onClick={() =>
-                              handleRemoveSaved(blog._id, {
-                                stopPropagation: () => {},
-                              })
-                            }
+                            onClick={(e) => handleRemoveSaved(savedBlog._id, e)}
                             sx={{ color: "#f44336" }}
                           >
                             <MdDelete />
@@ -520,7 +544,6 @@ const SavedBlogs = () => {
               })}
             </Grid>
 
-            {/* Pagination for larger screens */}
             {!isMobile && savedBlogs.length > itemsPerPage && (
               <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -561,14 +584,14 @@ const SavedBlogs = () => {
         )}
       </Paper>
 
-      {/* Blog Details Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
         PaperProps={{
-          sx: { borderRadius: 2 },
+          sx: { borderRadius: isMobile ? 0 : 2 },
         }}
       >
         {selectedBlog && (
@@ -590,7 +613,7 @@ const SavedBlogs = () => {
               </IconButton>
             </DialogTitle>
 
-            <Box sx={{ px: 3, pb: 1, display: "flex", alignItems: "center" }}>
+            <Box sx={{ px: 3, pb: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
               {selectedBlog.category && getCategoryChip(selectedBlog.category)}
               {selectedBlog.publishDate &&
                 new Date(selectedBlog.publishDate) <
@@ -598,7 +621,7 @@ const SavedBlogs = () => {
                   <Chip
                     label="Older Post"
                     size="small"
-                    sx={{ ml: 1, bgcolor: "#e0e0e0", fontWeight: 500 }}
+                    sx={{ bgcolor: "#e0e0e0", fontWeight: 500 }}
                   />
                 )}
             </Box>
@@ -648,7 +671,7 @@ const SavedBlogs = () => {
                   <Box
                     sx={{
                       mt: 2,
-                      p: 3,
+                      p: { xs: 2, sm: 3 },
                       bgcolor: "#f5f5f5",
                       borderRadius: 2,
                       mb: 3,
@@ -686,29 +709,33 @@ const SavedBlogs = () => {
               </DialogContentText>
             </DialogContent>
 
-            <DialogActions sx={{ px: 3, py: 2 }}>
+            <DialogActions sx={{ 
+              p: { xs: 2, sm: 3 },
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'stretch', sm: 'center' },
+              gap: { xs: 1, sm: 0 }
+            }}>
               <Button
-                onClick={() =>
-                  handleRemoveSaved(selectedBlog._id, {
-                    stopPropagation: () => {},
-                  })
-                }
+                onClick={(e) => handleRemoveSaved(selectedBlog._id, e)}
                 startIcon={<MdDelete />}
                 color="error"
                 variant="outlined"
+                fullWidth={isMobile}
+                sx={{ mb: { xs: 1, sm: 0 } }}
               >
-                Remove from Saved
+                Remove
               </Button>
 
               <Button
-                onClick={() =>
-                  handleShareBlog(selectedBlog._id, {
-                    stopPropagation: () => {},
-                  })
-                }
+                onClick={(e) => handleShareBlog(selectedBlog._id, e)}
                 startIcon={<MdShare />}
                 variant="outlined"
-                sx={{ ml: 1, mr: "auto" }}
+                fullWidth={isMobile}
+                sx={{ 
+                  ml: { xs: 0, sm: 1 }, 
+                  mr: { xs: 0, sm: 'auto' },
+                  mb: { xs: 1, sm: 0 } 
+                }}
               >
                 Share
               </Button>
@@ -716,7 +743,11 @@ const SavedBlogs = () => {
               <Button
                 onClick={handleCloseDialog}
                 variant="outlined"
-                sx={{ mr: 1 }}
+                fullWidth={isMobile}
+                sx={{ 
+                  mr: { xs: 0, sm: 1 },
+                  mb: { xs: 1, sm: 0 } 
+                }}
               >
                 Close
               </Button>
@@ -724,6 +755,7 @@ const SavedBlogs = () => {
               <Button
                 onClick={() => navigateToBlogPage(selectedBlog._id)}
                 variant="contained"
+                fullWidth={isMobile}
                 sx={{ bgcolor: "#3f51b5", "&:hover": { bgcolor: "#303f9f" } }}
                 endIcon={<MdChevronRight />}
               >

@@ -6,16 +6,18 @@ import Routers from "../routes/Routers";
 import { AuthContext } from "../context/AuthContext";
 
 export const Layout = () => {
-  const { role } = useContext(AuthContext); 
+  const { role } = useContext(AuthContext);
 
   return (
     <>
       {role !== "admin" && <Header />}
       {/* {role === "admin" && <Sidebar />} */}
-      <main>
+      <main className={role === "admin" ? "" : "pt-20 md:pt-24"}>
         <Routers />
       </main>
-      {role !== "admin" && <Footer />} 
+      {role !== "admin" && <Footer />}
     </>
   );
 };
+
+export default Layout;

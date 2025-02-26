@@ -18,6 +18,8 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   EmojiEvents as TrophyIcon,
@@ -47,6 +49,9 @@ const CarbonFootprint = () => {
   const [shareMenuAnchor, setShareMenuAnchor] = useState(null);
   const [selectedBadge, setSelectedBadge] = useState(null);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detects screens smaller than 'sm' (600px)
+
   useEffect(() => {
     fetchCarbonData();
     fetchBadges();
@@ -72,14 +77,13 @@ const CarbonFootprint = () => {
         return;
       }
 
-      // Transforming API response into Nivo-friendly format (Only Total Emissions)
       const transformedData = [
         {
           id: "Total Emissions",
           color: "hsl(96, 70%, 50%)",
           data: data.map((entry, index) => ({
-            x: `${index + 1}`, 
-            y: entry.Total || 0, 
+            x: `${index + 1}`,
+            y: entry.Total || 0,
           })),
         },
       ];
@@ -130,41 +134,34 @@ const CarbonFootprint = () => {
 
   const handleShareSocial = (platform) => {
     if (!selectedBadge) return;
-    console.log("Sharing badge on", platform);
-    console.log("Selected Badge:", selectedBadge);
-  
     const shareText = `I just earned the ${selectedBadge.name} badge for my eco-friendly efforts in reducing my carbon footprint!`;
-    
-    // Create a specific URL for the badge, including the badge ID
     const badgeUrl = `${window.location.origin}/badges/${selectedBadge._id}`;
-    let shareUrl = '';
-  
+    let shareUrl = "";
+
     switch (platform) {
-      case 'twitter':
+      case "twitter":
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(badgeUrl)}`;
         break;
-      case 'facebook':
+      case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(badgeUrl)}&quote=${encodeURIComponent(shareText)}`;
         break;
-      case 'linkedin':
+      case "linkedin":
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(badgeUrl)}&title=${encodeURIComponent(`${selectedBadge.name} Badge Earned`)}&summary=${encodeURIComponent(shareText)}`;
         break;
-      case 'whatsapp':
+      case "whatsapp":
         shareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${badgeUrl}`)}`;
         break;
-      case 'instagram':
-        // Instagram doesn't support direct sharing via URL, so we'll show a message
+      case "instagram":
         toast.info("To share on Instagram, take a screenshot of your badge and upload it to your Instagram story or post!");
         handleShareClose();
         return;
       default:
         break;
     }
-  
+
     if (shareUrl) {
-      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
     }
-    
     handleShareClose();
   };
 
@@ -180,6 +177,57 @@ const CarbonFootprint = () => {
       </Box>
     );
   }
+
+  // Dynamic graph configuration based on screen size
+  const graphConfig = {
+    margin: isMobile
+      ? { top: 20, right: 20, bottom: 60, left: 40 }
+      : { top: 50, right: 110, bottom: 50, left: 60 },
+    axisBottom: {
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: isMobile ? 45 : 0, // Rotate labels on mobile for readability
+      legend: "Readings",
+      legendOffset: isMobile ? 50 : 36,
+      legendPosition: "middle",
+    },
+    axisLeft: {
+      tickSize: 5,
+      tickPadding: 5,
+      tickRotation: 0,
+      legend: isMobile ? "CO₂ (kg)" : "Total Emission (kg CO₂)", // Shorten legend on mobile
+      legendOffset: isMobile ? -35 : -40,
+      legendPosition: "middle",
+    },
+    legends: isMobile
+      ? [] // Hide legend on mobile to save space
+      : [
+          {
+            anchor: "bottom-right",
+            direction: "column",
+            justify: false,
+            translateX: 100,
+            translateY: 0,
+            itemsSpacing: 0,
+            itemDirection: "left-to-right",
+            itemWidth: 80,
+            itemHeight: 20,
+            itemOpacity: 0.75,
+            symbolSize: 12,
+            symbolShape: "circle",
+            symbolBorderColor: "rgba(0, 0, 0, .5)",
+            effects: [
+              {
+                on: "hover",
+                style: {
+                  itemBackground: "rgba(0, 0, 0, .03)",
+                  itemOpacity: 1,
+                },
+              },
+            ],
+          },
+        ],
+  };
 
   return (
     <Container maxWidth="lg">
@@ -232,19 +280,16 @@ const CarbonFootprint = () => {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: "90%",
+                width: isMobile ? "95%" : "90%", // Slightly wider on mobile
                 maxWidth: 800,
                 bgcolor: "background.paper",
                 boxShadow: 24,
                 borderRadius: 4,
                 maxHeight: "80vh",
                 overflow: "auto",
-                "&:focus": {
-                  outline: "none",
-                },
+                "&:focus": { outline: "none" },
               }}
             >
-              {/* Header with gradient background */}
               <Box
                 sx={{
                   background:
@@ -260,7 +305,7 @@ const CarbonFootprint = () => {
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <TrophyIcon sx={{ color: "#FFD700", fontSize: 36, mr: 2 }} />
                   <Typography
-                    variant="h4"
+                    variant={isMobile ? "h5" : "h4"} // Smaller heading on mobile
                     component="h2"
                     sx={{ fontWeight: "bold", color: "white" }}
                   >
@@ -273,16 +318,14 @@ const CarbonFootprint = () => {
                     minWidth: "auto",
                     p: 1,
                     color: "white",
-                    "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.1)",
-                    },
+                    "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
                   }}
                 >
                   <CloseIcon />
                 </Button>
               </Box>
 
-              <Box sx={{ p: 4 }}>
+              <Box sx={{ p: isMobile ? 2 : 4 }}>
                 {badges.length === 0 ? (
                   <Box
                     sx={{
@@ -318,137 +361,132 @@ const CarbonFootprint = () => {
                     </Typography>
                   </Box>
                 ) : (
-                  <>
-                    <Grid container spacing={3}>
-                      {badges.map((badge) => (
-                        <Grid item xs={12} sm={6} md={4} key={badge.id}>
-                          <Paper
-                            elevation={3}
+                  <Grid container spacing={isMobile ? 2 : 3}>
+                    {badges.map((badge) => (
+                      <Grid item xs={12} sm={6} md={4} key={badge.id}>
+                        <Paper
+                          elevation={3}
+                          sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            transition:
+                              "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                            "&:hover": {
+                              transform: "translateY(-8px)",
+                              boxShadow: 8,
+                            },
+                            borderRadius: 3,
+                            overflow: "hidden",
+                            position: "relative",
+                          }}
+                        >
+                          <Tooltip title="Share Badge">
+                            <IconButton
+                              aria-label="share badge"
+                              onClick={(e) => handleShareClick(e, badge)}
+                              sx={{
+                                position: "absolute",
+                                top: 8,
+                                right: 8,
+                                zIndex: 10,
+                                bgcolor: "rgba(255, 255, 255, 0.7)",
+                                "&:hover": {
+                                  bgcolor: "rgba(255, 255, 255, 0.9)",
+                                },
+                              }}
+                              size="small"
+                            >
+                              <ShareIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Box
                             sx={{
-                              height: "100%",
+                              width: "100%",
+                              background:
+                                "linear-gradient(120deg, #f6d365 0%, #fda085 100%)",
+                              pt: 3,
+                              pb: 2,
                               display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              transition:
-                                "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-                              "&:hover": {
-                                transform: "translateY(-8px)",
-                                boxShadow: 8,
-                              },
-                              borderRadius: 3,
-                              overflow: "hidden",
-                              position: "relative",
+                              justifyContent: "center",
                             }}
                           >
-                            {/* Share Button */}
-                            <Tooltip title="Share Badge">
-                              <IconButton
-                                aria-label="share badge"
-                                onClick={(e) => handleShareClick(e, badge)}
-                                sx={{
-                                  position: "absolute",
-                                  top: 8,
-                                  right: 8,
-                                  zIndex: 10,
-                                  bgcolor: "rgba(255, 255, 255, 0.7)",
-                                  "&:hover": {
-                                    bgcolor: "rgba(255, 255, 255, 0.9)",
-                                  },
-                                }}
-                                size="small"
-                              >
-                                <ShareIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-
-                            <Box
+                            <Avatar
                               sx={{
-                                width: "100%",
-                                background:
-                                  "linear-gradient(120deg, #f6d365 0%, #fda085 100%)",
-                                pt: 3,
-                                pb: 2,
+                                width: isMobile ? 60 : 70,
+                                height: isMobile ? 60 : 70,
+                                bgcolor: "white",
+                                border: "4px solid white",
+                                boxShadow: 2,
+                              }}
+                            >
+                              {badge.icon ? (
+                                badge.icon
+                              ) : (
+                                <TrophyIcon
+                                  sx={{ color: "#FFD700", fontSize: 36 }}
+                                />
+                              )}
+                            </Avatar>
+                          </Box>
+
+                          <Box sx={{ p: isMobile ? 2 : 3, flexGrow: 1, width: "100%" }}>
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                mb: 1,
+                              }}
+                            >
+                              {badge.name}
+                            </Typography>
+                            <Divider sx={{ my: 1.5 }} />
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                textAlign: "center",
+                                minHeight: "3em",
                                 display: "flex",
+                                alignItems: "center",
                                 justifyContent: "center",
-                                position: "relative",
                               }}
                             >
-                              <Avatar
-                                sx={{
-                                  width: 70,
-                                  height: 70,
-                                  bgcolor: "white",
-                                  border: "4px solid white",
-                                  boxShadow: 2,
-                                }}
-                              >
-                                {badge.icon ? (
-                                  badge.icon
-                                ) : (
-                                  <TrophyIcon
-                                    sx={{ color: "#FFD700", fontSize: 36 }}
-                                  />
-                                )}
-                              </Avatar>
-                            </Box>
+                              {badge.description || "Achievement unlocked!"}
+                            </Typography>
+                          </Box>
 
-                            <Box sx={{ p: 3, flexGrow: 1, width: "100%" }}>
-                              <Typography
-                                variant="h6"
-                                sx={{
-                                  fontWeight: "bold",
-                                  textAlign: "center",
-                                  mb: 1,
-                                }}
-                              >
-                                {badge.name}
-                              </Typography>
-                              <Divider sx={{ my: 1.5 }} />
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{
-                                  textAlign: "center",
-                                  minHeight: "3em",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                {badge.description || "Achievement unlocked!"}
-                              </Typography>
-                            </Box>
-
-                            <Box
+                          <Box
+                            sx={{
+                              width: "100%",
+                              p: 2,
+                              bgcolor: "action.hover",
+                              borderTop: "1px solid",
+                              borderColor: "divider",
+                            }}
+                          >
+                            <Chip
+                              label={`Earned: ${new Date(
+                                badge.earnedDate
+                              ).toLocaleDateString()}`}
+                              size="small"
                               sx={{
                                 width: "100%",
-                                p: 2,
-                                bgcolor: "action.hover",
-                                borderTop: "1px solid",
-                                borderColor: "divider",
+                                bgcolor: "background.paper",
+                                fontWeight: 500,
                               }}
-                            >
-                              <Chip
-                                label={`Earned: ${new Date(
-                                  badge.earnedDate
-                                ).toLocaleDateString()}`}
-                                size="small"
-                                sx={{
-                                  width: "100%",
-                                  bgcolor: "background.paper",
-                                  fontWeight: 500,
-                                }}
-                              />
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </>
+                            />
+                          </Box>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
                 )}
               </Box>
 
-              {/* Share Menu */}
               <Menu
                 anchorEl={shareMenuAnchor}
                 open={Boolean(shareMenuAnchor)}
@@ -456,57 +494,55 @@ const CarbonFootprint = () => {
                 PaperProps={{
                   elevation: 3,
                   sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.15))',
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))",
                     mt: 1,
                     width: 200,
-                    '& .MuiMenu-list': {
-                      p: 1,
-                    },
-                    '&:before': {
+                    "& .MuiMenu-list": { p: 1 },
+                    "&:before": {
                       content: '""',
-                      display: 'block',
-                      position: 'absolute',
+                      display: "block",
+                      position: "absolute",
                       top: 0,
                       right: 14,
                       width: 10,
                       height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
                       zIndex: 0,
                     },
                   },
                 }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                <MenuItem onClick={() => handleShareSocial('whatsapp')}>
+                <MenuItem onClick={() => handleShareSocial("whatsapp")}>
                   <ListItemIcon>
-                    <FaWhatsapp style={{ color: '#25D366' }} />
+                    <FaWhatsapp style={{ color: "#25D366" }} />
                   </ListItemIcon>
                   <ListItemText>WhatsApp</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={() => handleShareSocial('twitter')}>
+                <MenuItem onClick={() => handleShareSocial("twitter")}>
                   <ListItemIcon>
-                    <FaTwitter style={{ color: '#1DA1F2' }} />
+                    <FaTwitter style={{ color: "#1DA1F2" }} />
                   </ListItemIcon>
                   <ListItemText>Twitter</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={() => handleShareSocial('facebook')}>
+                <MenuItem onClick={() => handleShareSocial("facebook")}>
                   <ListItemIcon>
-                    <FaFacebook style={{ color: '#4267B2' }} />
+                    <FaFacebook style={{ color: "#4267B2" }} />
                   </ListItemIcon>
                   <ListItemText>Facebook</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={() => handleShareSocial('linkedin')}>
+                <MenuItem onClick={() => handleShareSocial("linkedin")}>
                   <ListItemIcon>
-                    <FaLinkedin style={{ color: '#0077B5' }} />
+                    <FaLinkedin style={{ color: "#0077B5" }} />
                   </ListItemIcon>
                   <ListItemText>LinkedIn</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={() => handleShareSocial('instagram')}>
+                <MenuItem onClick={() => handleShareSocial("instagram")}>
                   <ListItemIcon>
-                    <FaInstagram style={{ color: '#E1306C' }} />
+                    <FaInstagram style={{ color: "#E1306C" }} />
                   </ListItemIcon>
                   <ListItemText>Instagram</ListItemText>
                 </MenuItem>
@@ -515,10 +551,13 @@ const CarbonFootprint = () => {
           </Fade>
         </Modal>
 
-        <Paper elevation={3} sx={{ p: 3, height: 400, mb: 4 }}>
+        <Paper
+          elevation={3}
+          sx={{ p: isMobile ? 2 : 3, height: isMobile ? 300 : 400, mb: 4 }}
+        >
           <ResponsiveLine
             data={footprintData}
-            margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+            margin={graphConfig.margin}
             xScale={{ type: "point" }}
             yScale={{
               type: "linear",
@@ -529,54 +568,15 @@ const CarbonFootprint = () => {
             }}
             axisTop={null}
             axisRight={null}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: "Readings",
-              legendOffset: 36,
-              legendPosition: "middle",
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: "Total Emission (kg CO₂)",
-              legendOffset: -40,
-              legendPosition: "middle",
-            }}
-            pointSize={10}
+            axisBottom={graphConfig.axisBottom}
+            axisLeft={graphConfig.axisLeft}
+            pointSize={isMobile ? 8 : 10} // Smaller points on mobile
             pointColor={{ theme: "background" }}
             pointBorderWidth={2}
             pointBorderColor={{ from: "serieColor" }}
             pointLabelYOffset={-12}
             useMesh={true}
-            legends={[
-              {
-                anchor: "bottom-right",
-                direction: "column",
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: "left-to-right",
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: "circle",
-                symbolBorderColor: "rgba(0, 0, 0, .5)",
-                effects: [
-                  {
-                    on: "hover",
-                    style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
-                      itemOpacity: 1,
-                    },
-                  },
-                ],
-              },
-            ]}
+            legends={graphConfig.legends}
           />
         </Paper>
       </Box>

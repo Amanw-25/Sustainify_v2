@@ -18,9 +18,9 @@ export const ProductInfo = ({ product }) => {
       <p className="text__para text-[14px] leading-6 md:text-[15px] lg:max-w-[390px] mb-3 mt-3">
         {product.shortdescription}
       </p>
-      <span className="bg-[#ccf0f3] mt-4 text-irisBlueColor py-4 px-6 lg:py-2 lg:px-6 text-[12px] leading-4 lg:text-[16px] lg:leading-7 font-semibold">
-        {product.category}
-      </span>
+      <span className="bg-[#ccf0f3] text-irisBlueColor py-2 px-6 text-[12px] leading-4 lg:text-[16px] lg:leading-7 font-semibold rounded-full inline-block mt-1 sm:mt-1">
+  {product.category}
+</span>
     </div>
   );
 };

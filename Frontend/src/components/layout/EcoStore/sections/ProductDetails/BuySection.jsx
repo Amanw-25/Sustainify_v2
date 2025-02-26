@@ -2,7 +2,7 @@ import { FaShoppingCart, FaHeart } from "react-icons/fa";
 
 export const BuySection = ({ product, cart, handleAddToCart, handleCheckout }) => {
   return (
-    <div className="relative h-full">
+    <div className="relative h-full mt-8 sm:mt-0">
       <div className="sticky top-10 p-6 border rounded-lg shadow-md bg-white min-h-[300px]">
         <h4 className="text-[20px] font-bold mb-4">Buy Now</h4>
         <div className="flex items-center gap-3 mb-6">

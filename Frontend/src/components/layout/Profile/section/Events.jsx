@@ -51,13 +51,13 @@ const Events = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const theme = useTheme();
+  const isXSmall = useMediaQuery(theme.breakpoints.down("xs"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const scrollRef = useRef(null);
 
-  // Calculate items per page based on screen size
   const getItemsPerPage = () => {
-    if (isMobile) return 1;
+    if (isXSmall || isMobile) return 1;
     if (isTablet) return 2;
     return 3;
   };
@@ -68,6 +68,15 @@ const Events = () => {
   useEffect(() => {
     fetchEventRequests();
   }, []);
+
+  useEffect(() => {
+    const newItemsPerPage = getItemsPerPage();
+    const newTotalPages = Math.ceil(eventRequests.length / newItemsPerPage);
+    
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      setCurrentPage(newTotalPages);
+    }
+  }, [isMobile, isTablet, eventRequests.length]);
 
   const fetchEventRequests = async () => {
     setLoading(true);
@@ -83,6 +92,9 @@ const Events = () => {
       }
 
       const data = await response.json();
+      if(data.requests.length === 0) {
+        toast.info("No event requests found");
+      }
       setEventRequests(data.requests || []);
     } catch (err) {
       setError(err.message);
@@ -120,16 +132,26 @@ const Events = () => {
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
+      scrollToTop();
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      scrollToTop();
+    }
+  };
+
+  const scrollToTop = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   const getStatusChip = (status) => {
+    const size = isMobile ? "small" : "medium";
+    
     switch (status) {
       case "approved":
         return (
@@ -137,7 +159,7 @@ const Events = () => {
             icon={<MdCheck />}
             label="Approved"
             color="success"
-            size="small"
+            size={size}
             sx={{ fontWeight: 500 }}
           />
         );
@@ -147,7 +169,7 @@ const Events = () => {
             icon={<MdAccessTime />}
             label="Pending"
             color="warning"
-            size="small"
+            size={size}
             sx={{ fontWeight: 500 }}
           />
         );
@@ -157,7 +179,7 @@ const Events = () => {
             icon={<MdClose />}
             label="Rejected"
             color="error"
-            size="small"
+            size={size}
             sx={{ fontWeight: 500 }}
           />
         );
@@ -167,7 +189,7 @@ const Events = () => {
             icon={<MdInfo />}
             label={status || "Unknown"}
             color="default"
-            size="small"
+            size={size}
             sx={{ fontWeight: 500 }}
           />
         );
@@ -201,6 +223,7 @@ const Events = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "50vh",
+          px: { xs: 2, sm: 3, md: 4 },
         }}
       >
         <CircularProgress />
@@ -210,8 +233,8 @@ const Events = () => {
 
   if (error) {
     return (
-      <Container>
-        <Paper sx={{ p: 3, mt: 3, borderRadius: 2, boxShadow: 3 }}>
+      <Container sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mt: 3, borderRadius: 2, boxShadow: 3 }}>
           <Typography variant="h6" color="error">
             {error}
           </Typography>
@@ -220,6 +243,7 @@ const Events = () => {
             startIcon={<MdRefresh />}
             onClick={fetchEventRequests}
             sx={{ mt: 2 }}
+            fullWidth={isMobile}
           >
             Try Again
           </Button>
@@ -229,14 +253,16 @@ const Events = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Paper sx={{ p: 4, borderRadius: 2, boxShadow: 3, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 3, md: 4 }, mb: 4, px: { xs: 2, sm: 3, md: 4 } }}>
+      <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: 2, boxShadow: 3, mb: 4 }}>
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "flex-start", sm: "center" },
             mb: 3,
+            gap: { xs: 2, sm: 0 },
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -244,7 +270,7 @@ const Events = () => {
               <MdEvent />
             </Avatar>
             <Typography
-              variant="h4"
+              variant={isMobile ? "h5" : "h4"}
               component="h1"
               gutterBottom
               sx={{ fontWeight: 600, m: 0 }}
@@ -256,7 +282,11 @@ const Events = () => {
             variant="contained"
             startIcon={<MdRefresh />}
             onClick={fetchEventRequests}
-            sx={{ bgcolor: "#3f51b5", "&:hover": { bgcolor: "#303f9f" } }}
+            sx={{ 
+              bgcolor: "#3f51b5", 
+              "&:hover": { bgcolor: "#303f9f" },
+              width: { xs: "100%", sm: "auto" } 
+            }}
           >
             Refresh
           </Button>
@@ -267,25 +297,34 @@ const Events = () => {
         {eventRequests.length === 0 ? (
           <Paper
             sx={{
-              p: 4,
+              p: { xs: 2, sm: 3, md: 4 },
               textAlign: "center",
               borderRadius: 2,
               bgcolor: "#f5f5f5",
             }}
           >
             <MdCalendarToday
-              style={{ fontSize: 48, color: "#9e9e9e", marginBottom: 16 }}
+              style={{ 
+                fontSize: isMobile ? 36 : 48, 
+                color: "#9e9e9e", 
+                marginBottom: 16 
+              }}
             />
-            <Typography variant="h6" gutterBottom>
+            <Typography variant={isMobile ? "subtitle1" : "h6"} gutterBottom>
               No event requests found
             </Typography>
-            <Typography variant="body1" color="textSecondary">
+            <Typography 
+              variant="body2" 
+              color="textSecondary"
+              sx={{ mb: 2 }}
+            >
               You haven't made any event requests yet.
             </Typography>
             <Button
               variant="outlined"
-              sx={{ mt: 2 }}
+              sx={{ mt: 1 }}
               onClick={() => navigate("/events")}
+              fullWidth={isMobile}
             >
               Explore Events
             </Button>
@@ -297,18 +336,32 @@ const Events = () => {
               ref={scrollRef}
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: { xs: "center", sm: "center" },
                 mb: 2,
+                gap: { xs: 1, sm: 0 },
               }}
             >
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ mb: { xs: 1, sm: 0 }, order: { xs: 2, sm: 1 } }}
+              >
                 Showing {(currentPage - 1) * itemsPerPage + 1} -
                 {Math.min(currentPage * itemsPerPage, eventRequests.length)} of{" "}
                 {eventRequests.length} requests
               </Typography>
 
-              <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  alignItems: "center",
+                  order: { xs: 1, sm: 2 },
+                  width: { xs: "100%", sm: "auto" },
+                  justifyContent: { xs: "center", sm: "flex-end" }
+                }}
+              >
                 <IconButton
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
@@ -342,7 +395,7 @@ const Events = () => {
             </Box>
 
             {/* Event cards */}
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
               {getCurrentPageRequests().map((request) => {
                 const eventDate = request.eventId?.date
                   ? new Date(request.eventId.date)
@@ -350,7 +403,13 @@ const Events = () => {
                 const isPastEvent = eventDate && eventDate < new Date();
 
                 return (
-                  <Grid item xs={12} md={isTablet ? 6 : 4} key={request._id}>
+                  <Grid 
+                    item 
+                    xs={12} 
+                    sm={isTablet ? 12 : 6} 
+                    md={isTablet ? 6 : 4} 
+                    key={request._id}
+                  >
                     <Card
                       variant="outlined"
                       sx={{
@@ -370,7 +429,7 @@ const Events = () => {
                       <Box sx={{ height: 8, bgcolor: getRandomColor() }} />
                       <CardContent sx={{ pt: 3, flexGrow: 1 }}>
                         <Typography
-                          variant="h6"
+                          variant={isMobile ? "subtitle1" : "h6"}
                           component="div"
                           gutterBottom
                           sx={{
@@ -380,20 +439,27 @@ const Events = () => {
                             WebkitBoxOrient: "vertical",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            height: 48,
+                            minHeight: { xs: 40, sm: 48 },
                           }}
                         >
                           {request.eventId?.name || "Untitled Event"}
                         </Typography>
 
-                        <Box sx={{ mt: 1, mb: 2 }}>
+                        <Box 
+                          sx={{ 
+                            mt: 1, 
+                            mb: 2,
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 1
+                          }}
+                        >
                           {getStatusChip(request.status)}
                           {isPastEvent && (
                             <Chip
                               label="Past Event"
-                              size="small"
+                              size={isMobile ? "small" : "medium"}
                               sx={{
-                                ml: 1,
                                 bgcolor: "#e0e0e0",
                                 fontWeight: 500,
                               }}
@@ -405,9 +471,17 @@ const Events = () => {
                           sx={{ display: "flex", alignItems: "center", mt: 2 }}
                         >
                           <MdAccessTime
-                            style={{ marginRight: "8px", color: "#666" }}
+                            style={{ marginRight: "8px", color: "#666", flexShrink: 0 }}
                           />
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary"
+                            sx={{
+                              whiteSpace: { xs: "normal", sm: "nowrap" },
+                              overflow: "hidden",
+                              textOverflow: "ellipsis"
+                            }}
+                          >
                             {request.eventId?.date
                               ? new Date(
                                   request.eventId.date
@@ -424,18 +498,25 @@ const Events = () => {
                         </Box>
 
                         <Box
-                          sx={{ display: "flex", alignItems: "center", mt: 1 }}
+                          sx={{ display: "flex", alignItems: "flex-start", mt: 1 }}
                         >
                           <MdLocationOn
-                            style={{ marginRight: "8px", color: "#666" }}
+                            style={{ 
+                              marginRight: "8px", 
+                              color: "#666", 
+                              marginTop: "3px",
+                              flexShrink: 0 
+                            }}
                           />
                           <Typography
                             variant="body2"
                             color="text.secondary"
                             sx={{
-                              whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
                             {request.eventId?.location ||
@@ -452,9 +533,17 @@ const Events = () => {
                             }}
                           >
                             <MdInfo
-                              style={{ marginRight: "8px", color: "#666" }}
+                              style={{ marginRight: "8px", color: "#666", flexShrink: 0 }}
                             />
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography 
+                              variant="body2" 
+                              color="text.secondary"
+                              sx={{
+                                whiteSpace: { xs: "normal", sm: "nowrap" },
+                                overflow: "hidden",
+                                textOverflow: "ellipsis"
+                              }}
+                            >
                               Requested:{" "}
                               {new Date(request.requestDate).toLocaleDateString(
                                 "en-US",
@@ -470,13 +559,22 @@ const Events = () => {
                       </CardContent>
 
                       <CardActions
-                        sx={{ justifyContent: "space-between", px: 2, pb: 2 }}
+                        sx={{ 
+                          justifyContent: { xs: "center", sm: "space-between" },
+                          flexDirection: { xs: "column", sm: "row" },
+                          px: 2, 
+                          pb: 2,
+                          gap: 1
+                        }}
                       >
                         <Button
                           size="small"
                           onClick={() => handleViewDetails(request)}
                           startIcon={<MdInfo />}
-                          sx={{ color: "#3f51b5" }}
+                          sx={{ 
+                            color: "#3f51b5",
+                            width: { xs: "100%", sm: "auto" } 
+                          }}
                         >
                           View Details
                         </Button>
@@ -486,7 +584,10 @@ const Events = () => {
                             size="small"
                             endIcon={<MdChevronRight />}
                             onClick={() => navigateToEventPage(request.eventId)}
-                            sx={{ color: "#3f51b5" }}
+                            sx={{ 
+                              color: "#3f51b5",
+                              width: { xs: "100%", sm: "auto" } 
+                            }}
                           >
                             Go to Event
                           </Button>
@@ -509,6 +610,7 @@ const Events = () => {
                   showFirstButton
                   showLastButton
                   size={isTablet ? "small" : "medium"}
+                  siblingCount={isTablet ? 0 : 1}
                 />
               </Box>
             )}
@@ -523,14 +625,20 @@ const Events = () => {
         maxWidth="sm"
         fullWidth
         PaperProps={{
-          sx: { borderRadius: 2 },
+          sx: { borderRadius: 2, margin: { xs: 2, sm: 3 }, width: { xs: "calc(100% - 16px)", sm: "auto" } },
         }}
       >
         {selectedRequest && (
           <>
-            <DialogTitle sx={{ pb: 1 }}>
+            <DialogTitle 
+              sx={{ 
+                pb: 1,
+                pt: { xs: 2, sm: 3 },
+                px: { xs: 2, sm: 3 }
+              }}
+            >
               <Typography
-                variant="h6"
+                variant={isMobile ? "subtitle1" : "h6"}
                 component="div"
                 sx={{ fontWeight: 600, pr: 6 }}
               >
@@ -545,21 +653,42 @@ const Events = () => {
               </IconButton>
             </DialogTitle>
 
-            <Box sx={{ px: 3, pb: 1 }}>
+            <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1 }}>
               {getStatusChip(selectedRequest.status)}
             </Box>
 
-            <DialogContent dividers>
+            <DialogContent 
+              dividers
+              sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}
+            >
               <DialogContentText component="div">
-                <Box sx={{ display: "flex", alignItems: "flex-start", mb: 3 }}>
-                  <Avatar sx={{ bgcolor: "#e3f2fd", color: "#1976d2", mr: 2 }}>
+                <Box 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: { xs: "flex-start", sm: "flex-start" },
+                    flexDirection: { xs: "column", sm: "row" },
+                    mb: 3,
+                    gap: { xs: 1, sm: 2 }
+                  }}
+                >
+                  <Avatar 
+                    sx={{ 
+                      bgcolor: "#e3f2fd", 
+                      color: "#1976d2", 
+                      mb: { xs: 1, sm: 0 },
+                      alignSelf: { xs: "flex-start", sm: "center" }
+                    }}
+                  >
                     <MdAccessTime />
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                       Date & Time
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography 
+                      variant="body1"
+                      sx={{ wordBreak: "break-word" }}
+                    >
                       {selectedRequest.eventId?.date
                         ? new Date(
                             selectedRequest.eventId.date
@@ -577,37 +706,55 @@ const Events = () => {
                   </Box>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "flex-start", mb: 3 }}>
-                  <Avatar sx={{ bgcolor: "#e8f5e9", color: "#2e7d32", mr: 2 }}>
+                <Box 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: { xs: "flex-start", sm: "flex-start" },
+                    flexDirection: { xs: "column", sm: "row" },
+                    mb: 3,
+                    gap: { xs: 1, sm: 2 }
+                  }}
+                >
+                  <Avatar 
+                    sx={{ 
+                      bgcolor: "#e8f5e9", 
+                      color: "#2e7d32", 
+                      mb: { xs: 1, sm: 0 },
+                      alignSelf: { xs: "flex-start", sm: "center" }
+                    }}
+                  >
                     <MdLocationOn />
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
                       Location
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography 
+                      variant="body1"
+                      sx={{ wordBreak: "break-word" }}
+                    >
                       {selectedRequest.eventId?.location ||
                         "Location not specified"}
                     </Typography>
                   </Box>
                 </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    component={Link}
-                    to={`/event-details/${selectedRequest.eventId?._id}`} 
-                    sx={{ textTransform: "none", fontWeight: 500 }}
-                  >
-                    Go to Event Page
-                  </Button>
-                </Box>
               </DialogContentText>
             </DialogContent>
 
-            <DialogActions sx={{ px: 3, py: 2 }}>
-              <Button onClick={handleCloseDialog} variant="outlined">
+            <DialogActions 
+              sx={{ 
+                px: { xs: 2, sm: 3 }, 
+                py: { xs: 2, sm: 2 },
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: "center",
+                gap: 1
+              }}
+            >
+              <Button 
+                onClick={handleCloseDialog} 
+                variant="outlined"
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
                 Close
               </Button>
 
@@ -620,6 +767,7 @@ const Events = () => {
                     sx={{
                       bgcolor: "#3f51b5",
                       "&:hover": { bgcolor: "#303f9f" },
+                      width: { xs: "100%", sm: "auto" }
                     }}
                     endIcon={<MdChevronRight />}
                   >

@@ -9,7 +9,9 @@ import {
   Checkbox,
   Chip,
   Alert,
+  IconButton,
 } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { editorModules, editorFormats } from "./editorConfig";
@@ -80,9 +82,8 @@ const CreatePost = () => {
     }
   };
 
-  const handleTagInputKeyPress = (e) => {
-    if (e.key === "Enter" && tagInput.trim()) {
-      e.preventDefault();
+  const addTag = () => {
+    if (tagInput.trim()) {
       setPostData((prev) => ({
         ...prev,
         tags: [...new Set([...prev.tags, tagInput.trim()])],
@@ -91,6 +92,13 @@ const CreatePost = () => {
       if (errors.tags) {
         setErrors((prev) => ({ ...prev, tags: false }));
       }
+    }
+  };
+
+  const handleTagInputKeyPress = (e) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      addTag();
     }
   };
 
@@ -165,17 +173,27 @@ const CreatePost = () => {
             sx={styles.tag}
           />
         ))}
-        <TextField
-          required
-          placeholder="Add tags (press Enter)"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyPress={handleTagInputKeyPress}
-          variant="standard"
-          error={errors.tags}
-          helperText={errors.tags ? "At least one tag is required" : ""}
-          sx={styles.tagInput}
-        />
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <TextField
+            required
+            placeholder="Add tags"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyPress={handleTagInputKeyPress}
+            variant="standard"
+            error={errors.tags}
+            helperText={errors.tags ? "At least one tag is required" : ""}
+            sx={{ ...styles.tagInput, flexGrow: 1 }}
+          />
+          <IconButton 
+            onClick={addTag} 
+            color="primary" 
+            disabled={!tagInput.trim()}
+            sx={{ ml: 1 }}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
       </Box>
 
       <Box sx={{ border: errors.content ? '1px solid #d32f2f' : 'none', borderRadius: 1, mb: 1 }}>

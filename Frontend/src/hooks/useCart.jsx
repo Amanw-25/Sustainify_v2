@@ -5,24 +5,6 @@ export const useCart = () => {
   const [cart, setCart] = useState(null);
   const token = localStorage.getItem("token");
 
-  const fetchCart = useCallback(async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/cart/get`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        setCart(data);
-      } else {
-        setCart({ items: [] }); 
-      }
-    } catch (error) {
-      console.error("Cart fetch error:", error);
-      setCart({ items: [] });
-    }
-  }, [token]);
-
   const addToCart = useCallback(async (product, quantity = 1) => {
     try {
       const response = await fetch(`${BASE_URL}/cart/add`, {
@@ -48,6 +30,24 @@ export const useCart = () => {
       return false;
     }
   }, [token]);
+
+  const fetchCart = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/cart/get`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setCart(data);
+      } else {
+        setCart({ items: [] }); 
+      }
+    } catch (error) {
+      console.error("Cart fetch error:", error);
+      setCart({ items: [] });
+    }
+  }, [token,addToCart]);
 
   const updateQuantity = useCallback(async (productId, quantity) => {
     try {

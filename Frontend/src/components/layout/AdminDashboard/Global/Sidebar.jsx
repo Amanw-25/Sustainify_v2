@@ -60,7 +60,6 @@ const menuItems = [
     items: [
       { title: "Blog Data", icon: <BarChartOutlinedIcon />, to: "/blog-data" },
       { title: "Manage Blog", icon: <PieChartOutlineOutlinedIcon />, to: "/manage-blog" },
-      { title: "Subscription Line Chart", icon: <TimelineOutlinedIcon />, to: "/line" },
     ]
   }
 ];

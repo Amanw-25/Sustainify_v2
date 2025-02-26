@@ -43,13 +43,13 @@ export const navLinks = [
     display: "Home",
   },
   {
-    path: "/about",
+    path: "about",
     display: "About Us",
   },
   {
     path: "/services",
     display: "Services",
-    dropdown: true, // Indicates this item has a dropdown
+    dropdown: true, 
   },
   {
     path: "/contact",

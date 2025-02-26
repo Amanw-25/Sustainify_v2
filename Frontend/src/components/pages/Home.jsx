@@ -415,7 +415,7 @@ const Home = () => {
                 </Box>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} className="about">
                 <Typography
                   variant="overline"
                   sx={{
@@ -1018,7 +1018,8 @@ const Home = () => {
                             variant="h5"
                             sx={{
                               fontWeight: 700,
-                              mb: 1
+                              mb: 1,
+                              color: "white"
                             }}
                           >
                             {testimonial.name}
@@ -1029,7 +1030,8 @@ const Home = () => {
                             sx={{
                               opacity: 0.9,
                               fontSize: "0.95rem",
-                              mb: 3
+                              mb: 3,
+                              color: "white"
                             }}
                           >
                             {testimonial.title}
@@ -1053,7 +1055,7 @@ const Home = () => {
                                 <Typography variant="h6" sx={{ color: "#9fffd1", fontWeight: 800 }}>
                                   {metric.value}
                                 </Typography>
-                                <Typography variant="caption" sx={{ opacity: 0.8, fontSize: "0.8rem" }}>
+                                <Typography variant="caption" sx={{ opacity: 0.8, fontSize: "0.8rem",color: "white" }}>
                                   {metric.label}
                                 </Typography>
                               </Box>
@@ -1078,7 +1080,8 @@ const Home = () => {
                               lineHeight: 1.8,
                               fontStyle: "italic",
                               letterSpacing: "0.3px",
-                              fontSize: { xs: "1.1rem", md: "1.25rem" }
+                              fontSize: { xs: "1.1rem", md: "1.25rem" },
+                              color: "white"
                             }}
                           >
                             "{testimonial.quote}"
