@@ -141,12 +141,11 @@ export const verifyPayment = async (req, res) => {
     let session;
     try {
       session = await stripe.checkout.sessions.retrieve(session_id, {
-        expand: ["line_items", "shipping_details"],
+        expand: ["line_items"],
       });
     } catch (stripeError) {
       return res.status(400).json({
         success: false,
-        message: "Invalid session ID",
         error: stripeError.message,
       });
     }
