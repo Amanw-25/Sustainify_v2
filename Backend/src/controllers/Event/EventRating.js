@@ -57,7 +57,7 @@ export const getEventRating = async (req, res) => {
 export const updateEventRating = async (req, res) => {
   const { comments, rating } = req.body;
   const userId = req.userId;
-  const eventId = req.params;
+  const { eventId } = req.params;
 
   try {
     if (!comments || !rating) {

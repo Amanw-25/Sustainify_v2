@@ -83,7 +83,7 @@ export const updateBlogReview = async (req, res) => {
       review,
     });
   } catch (error) {
-    res.statsu(500).json({
+    res.status(500).json({
       message: "Internal server error",
       error: error.message,
     });
