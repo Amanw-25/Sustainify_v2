@@ -84,7 +84,7 @@ const CarbonFootprint = mongoose.model(
 const factors = {
   Petrol: 2.296,
   Diesel: 2.716,
-  Electricity: 0.7132,
+  Electricity: 0.82,
   NaturalGas: 0.203,
   CNG: 2.72,
   Flight: 2.5,
